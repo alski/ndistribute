@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>demoMVVM</id>
+    <version>1.0.1</version>
+    <title>demoMvvm</title>
+    <authors>AlSki</authors>
+    <owners>AlSki</owners>
+    <licenseUrl>https://demomvvm.codeplex.com/license</licenseUrl>
+    <projectUrl>http://demomvvm.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Tiny mvvm library that does the absolute minium that you need in order to demonstrate MVVM functionality.</description>
+    <summary>Tiny mvvm library that does the absolute minium that you need in order to demonstrate MVVM functionality.</summary>
+    <releaseNotes>First version</releaseNotes>
+    <copyright>Copyright 2013 Alan Gardner</copyright>
+    <language />
+    <tags>MVVM WPF</tags>
+  </metadata>
+</package>

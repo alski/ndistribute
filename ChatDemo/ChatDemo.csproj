@@ -37,6 +37,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="demoMVVM">
+      <HintPath>..\packages\demoMVVM.1.0.1\lib\net45\demoMVVM.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -61,10 +64,8 @@
       <DependentUpon>Connection.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Message.cs" />
-    <Compile Include="MVVM\ViewModelBase.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="ViewModel\ChatViewModel.cs" />
-    <Compile Include="MVVM\Command.cs" />
     <Compile Include="ViewModel\MessageViewModel.cs" />
     <Page Include="Connection.xaml">
       <SubType>Designer</SubType>
@@ -93,6 +94,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

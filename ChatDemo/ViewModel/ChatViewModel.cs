@@ -1,5 +1,4 @@
-﻿using ChatDemo.MVVM;
-using nDistribute.WCF;
+﻿using nDistribute.WCF;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using nDistribute;
+using demoMVVM;
 
 namespace ChatDemo.ViewModel
 {

@@ -1,5 +1,4 @@
-﻿using ChatDemo.MVVM;
-using ChatDemo.ViewModel;
+﻿using ChatDemo.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
