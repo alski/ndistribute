@@ -14,6 +14,8 @@ namespace nDistribute
             Formatter = new BinaryFormatter(); 
         }
 
+        public static string SchemaName { get; protected set; }
+
         private readonly List<INode> _cache = new List<INode>();
 
         private readonly Lazy<INode> _local;

@@ -16,7 +16,7 @@ namespace nDistribute.WCF.Tests.ThatNetworkManager
         {
             var manager = new NetworkManager();
             WCFNetwork.Register();
-            var connection = manager.ConnectTo("net-tcp:xxxx");
+            var connection = manager.ConnectTo(WCFNetwork.SchemaName+":xxxx");
             connection.ShouldNotBeNull();
         }
 

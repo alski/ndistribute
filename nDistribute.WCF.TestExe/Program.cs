@@ -17,13 +17,11 @@ namespace nDistribute.WCF.TestExe
         {
             Debugger.Launch();
 
-            var address = "net.tcp://localhost:" + NetworkFactory.FreeTcpPort();
-            Console.WriteLine(args[0] + ": " + address);
-            _network = new WCFNetwork(address);
+            _network = new WCFNetwork(NetworkFactory.FreeTcpPort());
             _network.Start();
             _network.GetChannel<OutgoingMessage>().Received += Program_Received;
-            _network.Connect(new NodeAddress( args[0]));
-            _network.GetChannel<RegisteredMessage>().Send(new RegisteredMessage { Address = address });
+            _network.Connect(new NodeAddress(args[0]));
+            _network.GetChannel<RegisteredMessage>().Send(new RegisteredMessage { Address = _network.Local.Address.Address });
 
             _returnChannel = _network.GetChannel<ReturnMessage>();
             //You should never see this, but just in case

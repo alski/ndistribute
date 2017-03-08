@@ -12,12 +12,17 @@
     /// <summary>A network that uses WCF as an underlying transport.</summary>
     public class WCFNetwork : NetworkBase
     {
+        static WCFNetwork()
+        {
+            SchemaName = "net-tcp";
+        }
+
         public static void Register()
         {
             NetworkManager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.StartsWith("net-tcp:"),
+                    CanCreate = x => x.StartsWith(SchemaName),
                     CreateNetwork = y => new WCFNetwork(y)
                 });
         }
@@ -26,10 +31,16 @@
         private Node _node;
 
         /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
-        /// <param name="endpoint">The endpoint.</param>
-        public WCFNetwork(string endpoint)
+        public WCFNetwork(int port)
+            : this(new NodeAddress(SchemaName, Environment.MachineName, port))
+        { }
+
+        private WCFNetwork(string serialisedEndpoint)
+            : this(new NodeAddress(serialisedEndpoint))
+        { }
+
+        private WCFNetwork(NodeAddress address)
         {
-            var address = new NodeAddress(endpoint);
             //if (RemoteConnectionService.Node != null)
             //    throw new InvalidOperationException("WCFNetwork does not support more than one network per process in this version.");
             _node = new Node(address, this);

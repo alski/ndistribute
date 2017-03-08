@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,9 +38,19 @@ namespace ChatDemo
                 Properties.Settings.Default.Save();
             }
 
-            var network = new WCFNetwork("net.tcp://" + Environment.MachineName + ":" + port);
-            network.IsConnectedChanged += RememberNetwork;
-            network.Start();
+            WCFNetwork network;
+            try
+            {
+               network = new WCFNetwork(port);
+                network.IsConnectedChanged += RememberNetwork;
+                network.Start();
+            }
+            catch (AddressAlreadyInUseException ex)
+            {
+                network = new WCFNetwork(NetworkFactory.FreeTcpPort());
+                network.IsConnectedChanged += RememberNetwork;
+                network.Start();
+            }
             return network;
         }
 

@@ -10,12 +10,16 @@
     public class NodeAddress : IEquatable<NodeAddress>
     {
         /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
-        /// <param name="name">The name.</param>
         /// <param name="address">The address </param>
         public NodeAddress(string address)
         {
             this.Address = address;
         }
+
+        /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
+        public NodeAddress(string schemaName, string machineName, int port)
+            : this(schemaName + ":" + machineName + ":" + port)
+        { }
 
         /// <summary>Gets or sets the address.</summary>
         [DataMember]

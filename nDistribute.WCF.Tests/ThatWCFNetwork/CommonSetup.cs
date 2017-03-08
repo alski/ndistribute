@@ -38,10 +38,10 @@
         //[TestFixtureSetUp]
         public void Setup()
         {
-            _address = "net.tcp://localhost:" + NetworkFactory.FreeTcpPort();
-
-            this._testNetwork = new WCFNetwork(_address);
+        
+            this._testNetwork = new WCFNetwork(NetworkFactory.FreeTcpPort());
             this._testNetwork.Start();
+            _address = _testNetwork.Local.Address.Address;
             _testNetwork.GetChannel<RegisteredMessage>().Received += RegisteredAddressRecieved;
             this._testOutgoing = _testNetwork.GetChannel<OutgoingMessage>();
             this._testReturn = _testNetwork.GetChannel<ReturnMessage>();
