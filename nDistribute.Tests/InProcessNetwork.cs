@@ -38,9 +38,9 @@
         /// <param name="alternateNetwork">Network to work with </param>
         private InProcessNetwork(string networkName)
         {
-            this.NetworkName = networkName;
-            
-            this.AddNetwork(this);
+            NetworkName = networkName;
+
+            AddNetwork(this);
         }
 
         internal string NetworkName { get; private set; }
@@ -54,7 +54,7 @@
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode CreateLocal()
         {
-            return Create(new NodeAddress(this.NetworkName));
+            return Create(new NodeAddress(NetworkName));
         }
 
         /// <summary>The create.</summary>

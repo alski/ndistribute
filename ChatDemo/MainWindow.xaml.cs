@@ -30,7 +30,7 @@ namespace ChatDemo
             if (e.Key == Key.Enter
                 && e.KeyboardDevice.Modifiers == ModifierKeys.None)
             {
-                ((ChatViewModel)this.DataContext).SendCommand.Execute(null);
+                ((ChatViewModel)DataContext).SendCommand.Execute(null);
             }
         } 
     }

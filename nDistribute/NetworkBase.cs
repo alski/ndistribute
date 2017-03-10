@@ -16,19 +16,19 @@ namespace nDistribute
 
         public static string SchemaName { get; protected set; }
 
-        private readonly List<INode> _cache = new List<INode>();
+        private readonly List<INode> cachedNodes = new List<INode>();
 
-        private readonly Lazy<INode> _local;
-        private List<IChannel> _channels = new List<IChannel>();
-                
+        private readonly Lazy<INode> localNode;
+
+        private IList<IChannel> channels = new List<IChannel>();
+
         /// <summary>Initialises a new instance of the <see cref="NetworkBase"/> class.</summary>
         protected NetworkBase()
         {
-            this._local = new Lazy<INode>(this.BuildLocal);
-            Formatter = new BinaryFormatter();
+            localNode = new Lazy<INode>(BuildLocal);
         }
 
-        public IEnumerable<IChannel> Channels { get { return _channels; } }
+        public IEnumerable<IChannel> Channels => channels;
 
         public event EventHandler<IChannel> ChannelCreated;
         
@@ -37,7 +37,7 @@ namespace nDistribute
         /// <summary>Gets the local Node.</summary>
         public INode Local
         {
-            get { return this._local.Value; }
+            get { return localNode.Value; }
         }
 
         /// <summary>Finds the <see cref="Node"/> for the given <see cref="NodeAddress"/>.</summary>
@@ -45,12 +45,12 @@ namespace nDistribute
         /// <returns>The found <see cref="Node"/>.</returns>
         public INode FindOrCreate(NodeAddress address)
         {
-            var found = this.FindOrDefault(address);
+            var found = FindOrDefault(address);
 
             if (found == null)
             {
-                found = this.Create(address);
-                this._cache.Add(found);
+                found = Create(address);
+                cachedNodes.Add(found);
             }
 
             return found;
@@ -61,7 +61,7 @@ namespace nDistribute
         /// <returns>The found <see cref="Node"/> or null.</returns>
         public INode FindOrDefault(NodeAddress address)
         {
-            var found = (from x in this._cache where x.Address.Matches(address) select x).FirstOrDefault();
+            var found = (from x in cachedNodes where x.Address.Matches(address) select x).FirstOrDefault();
             return found;
         }
 
@@ -76,8 +76,8 @@ namespace nDistribute
 
         private INode BuildLocal()
         {
-            var newNode = this.CreateLocal();
-            this._cache.Add(newNode);
+            var newNode = CreateLocal();
+            cachedNodes.Add(newNode);
             return newNode;
         }
 
@@ -85,7 +85,7 @@ namespace nDistribute
         /// <param name="child">The child.</param>
         public virtual void Connect(NodeAddress child)
         {
-            this.Local.Connect(child);
+            Local.Connect(child);
         }
 
         public void Connect(string address)
@@ -110,7 +110,7 @@ namespace nDistribute
             if (found == null)
             {
                 found = (IChannel) Activator.CreateInstance(type, new object[] { this });
-                _channels.Add(found);
+                channels.Add(found);
                 OnChannelCreated(found);
             }
             return found;
@@ -125,7 +125,7 @@ namespace nDistribute
             if (found == null)
             {
                 found = new NetworkChannel<T>(this);
-                _channels.Add(found);
+                channels.Add(found);
                 OnChannelCreated(found);
             }
             return (NetworkChannel<T>)found;
@@ -133,11 +133,8 @@ namespace nDistribute
 
         private void OnChannelCreated(IChannel found)
         {
-            var temp = ChannelCreated;
-            if (temp != null)
-            {
-                temp(this, found);
-            }
+            ChannelCreated?.Invoke(this, found);
         }
+
     }
 }

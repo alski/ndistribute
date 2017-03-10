@@ -16,7 +16,7 @@
         internal WCFClientNode(NodeContractClient client, NodeAddress address, INetwork network)
             : base(address, network)
         {
-            this._client = client;
+            _client = client;
         }
 
         /// <summary>The connect.</summary>
@@ -24,21 +24,21 @@
         /// <returns>The <see cref="NodeAddress"/>.</returns>
         public override NodeAddress Connect(NodeAddress newNode)
         {
-            return this._client.Connect(newNode);
+            return _client.Connect(newNode);
         }
 
         /// <summary>The advise connect.</summary>
         /// <param name="newParent">The new parent.</param>
         public override void AdviseConnect(NodeAddress newParent)
         {
-            this._client.AdviseConnectAsync(newParent);            
+            _client.AdviseConnectAsync(newParent);            
         }
 
         /// <summary>The child disconnect.</summary>
         /// <param name="address">The address.</param>        
         public override void ChildDisconnect(NodeAddress address)
         {
-            this._client.ChildDisconnectAsync(address);
+            _client.ChildDisconnectAsync(address);
         }
 
         /// <summary>The send.</summary>
@@ -46,7 +46,7 @@
         /// <param name="type"><see cref="Type"/> to deserialize data back to.</param>
         public override void Send(string type, byte[] data, NodeAddress from)
         {
-            this._client.SendAsync(type, data, from);
+            _client.SendAsync(type, data, from);
         }
     }
 }

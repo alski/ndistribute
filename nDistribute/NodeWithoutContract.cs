@@ -16,7 +16,7 @@
         /// <summary>Gets a value indicating whether has parent.</summary>
         public bool HasParent
         {
-            get { return this.Address.Parent != null; }
+            get { return Address.Parent != null; }
         }
 
         /// <summary>Gets or sets the <see cref="INetwork"/>.</summary>
@@ -30,7 +30,7 @@
         /// <returns>The <see cref="bool"/>.</returns>
         public bool HasChild(NodeAddress address)
         {
-            return this.Children.Any(x => x.Matches(address));
+            return Children.Any(x => x.Matches(address));
         }
 
         /// <summary>The disconnect.</summary>
@@ -65,34 +65,34 @@
         /// <returns>The <see cref="bool"/>.</returns>
         protected void DetachFromParent()
         {
-            var parent = this.Address.Parent;
-            var parentNode = this.Network.FindOrCreate(parent);
-            parentNode.ChildDisconnect(this.Address);
-            this.Address.Parent = null;
+            var parent = Address.Parent;
+            var parentNode = Network.FindOrCreate(parent);
+            parentNode.ChildDisconnect(Address);
+            Address.Parent = null;
         }
 
         /// <summary>Registers a child node.</summary>
         /// <param name="address">The address.</param>
         protected void AddChild(NodeAddress address)
         {
-            this.Children.Add(address);
+            Children.Add(address);
         }
 
         public void SendToNetwork(INetwork network, string type, byte[] data, NodeAddress from)
         {
-            var recipient = network.FindOrDefault(this.Address.Parent);
+            var recipient = network.FindOrDefault(Address.Parent);
             if (recipient != null
                 && recipient.Address.Matches(from) == false)
             {
-                recipient.Send(type, data, this.Address);
+                recipient.Send(type, data, Address);
             }
 
-            foreach (var x in this.Children)
+            foreach (var x in Children)
             {
                 if (x.Matches(from) == false)
                 {
                     recipient = network.FindOrDefault(x);
-                    recipient.Send(type, data, this.Address);
+                    recipient.Send(type, data, Address);
                 }
             }
         }

@@ -87,22 +87,22 @@
             Contract.EndContractBlock();
 
             Service = new RemoteConnectionService { Node = _node };
-            this._host = new ServiceHost(Service, new Uri(Address.Address));
-            this._host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Address.Address);
-            this._host.Open();
+            _host = new ServiceHost(Service, new Uri(Address.Address));
+            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Address.Address);
+            _host.Open();
             Service.Node = _node;
         }
 
         private bool IsStarted()
         {
-            return this._host != null;
+            return _host != null;
         }
 
         /// <summary>Stops the WCF host.</summary>
         internal void Stop()
         {
-            this._host.Close();
-            this._host = null;
+            _host.Close();
+            _host = null;
         }
 
         /// <summary>Creates nodes representing other nodes.</summary>
@@ -145,12 +145,11 @@
 
         public override void Connect(NodeAddress child)
         {
-            if (this.IsStarted() == false)
-                this.Start();
+            if (IsStarted() == false)
+                Start();
 
             base.Connect(child);
         }
-
     }
 
     public class ConnectedEventArgs : EventArgs

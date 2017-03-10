@@ -26,7 +26,7 @@
         /// <returns>The <see cref="NodeAddress"/>.</returns>
         public override NodeAddress Connect(NodeAddress newNode)
         {
-            var originalNode = this.FindOriginalNode();
+            var originalNode = FindOriginalNode();
             if (originalNode is InProcessProxyNode)
             {
                 throw new NotImplementedException();
@@ -37,7 +37,7 @@
 
         private INode FindOriginalNode()
         {
-            var network = InProcessNetwork.Networks[this.Address.Address];
+            var network = InProcessNetwork.Networks[Address.Address];
             var remoteNode = new NodeAddress(network.NetworkName);
             return network.FindOrCreate(remoteNode);
         }
@@ -46,7 +46,7 @@
         /// <param name="newParent">The new parent.</param>
         public override void AdviseConnect(NodeAddress newParent)
         {
-            var originalNode = this.FindOriginalNode();
+            var originalNode = FindOriginalNode();
             if (originalNode is InProcessProxyNode)
             {
                 throw new NotImplementedException();
@@ -57,7 +57,7 @@
 
         public override void ChildDisconnect(NodeAddress address)
         {
-            var originalNode = this.FindOriginalNode();
+            var originalNode = FindOriginalNode();
             if (originalNode is InProcessProxyNode)
             {
                 throw new NotImplementedException();
@@ -68,7 +68,7 @@
 
         public override void Send(string type, byte[] data, NodeAddress from)
         {
-            var originalNode = this.FindOriginalNode();
+            var originalNode = FindOriginalNode();
             if (originalNode is InProcessProxyNode)
             {
                 throw new NotImplementedException();

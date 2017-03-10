@@ -108,12 +108,12 @@ namespace ChatDemo.ViewModel
         public string Error
         {
             get { return _error; }
-            private set { this.SetAndNotifyChanged(ref _error, value); }
+            private set { SetAndNotifyChanged(ref _error, value); }
         }
 
         public bool IsConnected
         {
-            get { return this._isConnected; }
+            get { return _isConnected; }
             set { SetAndNotifyChanged(ref _isConnected, value); }
         }
 

@@ -38,7 +38,7 @@ namespace ChatDemo
                 if (chat.IsConnected)
                 {
                     new MainWindow { DataContext = chat }.Show();
-                    this.Close();
+                    Close();
                 }
             }
         }

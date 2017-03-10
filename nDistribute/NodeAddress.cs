@@ -13,7 +13,7 @@
         /// <param name="address">The address </param>
         public NodeAddress(string address)
         {
-            this.Address = address;
+            Address = address;
         }
 
         /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
@@ -46,7 +46,7 @@
         /// <returns>The <see cref="string"/>.</returns>
         public override string ToString()
         {
-            return this.Address;
+            return Address;
         }
 
         /// <summary>Checks if one matches another</summary>
@@ -55,7 +55,7 @@
         internal bool Matches(NodeAddress other)
         {
             return other != null
-             && this.Address == other.Address;
+             && Address == other.Address;
         }
     }
 }

@@ -15,9 +15,9 @@
         /// <param name="locator">The locator used to connect to other nodes.</param>
         internal Node(NodeAddress newAddress, INetwork locator)
         {
-            this.Address = newAddress;
-            this.Network = locator;
-            this.ElectionStrategy = new FirstComeFirstElectedStrategy();
+            Address = newAddress;
+            Network = locator;
+            ElectionStrategy = new FirstComeFirstElectedStrategy();
         }
 
         /// <summary>Connects with a new node, by determining which is the parent.</summary>
@@ -26,22 +26,22 @@
         /// <returns>The <see cref="NodeAddress"/>.</returns>
         public override NodeAddress Connect(NodeAddress newNode)
         {
-            if (this.Address.Address == newNode.Address)
+            if (Address.Address == newNode.Address)
             {
-                throw new InvalidOperationException(this.Address + " - Can't connect to " + newNode);
+                throw new InvalidOperationException(Address + " - Can't connect to " + newNode);
             }
 
             var parent = this as INode;
-            var child = this.Network.FindOrCreate(newNode);
-            this.ElectionStrategy.DetermineParent(ref parent, ref child);
+            var child = Network.FindOrCreate(newNode);
+            ElectionStrategy.DetermineParent(ref parent, ref child);
             if (parent == this)
             {
                 ConnectChild(child);
-                return this.Address;
+                return Address;
             }
             else
             {
-                child.AdviseConnect(this.Address);
+                child.AdviseConnect(Address);
                 return null;
             }
         }
@@ -50,20 +50,20 @@
         {
             Contract.Assert(child.Address.Matches(Address.Parent) == false);
 
-            if (child.Address.Parent != this.Address)
+            if (child.Address.Parent != Address)
             {
                 if (child.HasParent)
                 {
-                    var existingParent = this.Network.FindOrCreate(child.Address.Parent);
+                    var existingParent = Network.FindOrCreate(child.Address.Parent);
                     existingParent.ChildDisconnect(child.Address);
                     child.Address.Parent = null;
                 }
 
-                this.AddChild(child.Address);
-                child.Address.Parent = this.Address;
+                AddChild(child.Address);
+                child.Address.Parent = Address;
 
                 // Also register our address with the other network, which will call back into here but the 'if (parent==this)' in Connect  will stop the recursive call
-                child.AdviseConnect(this.Address);
+                child.AdviseConnect(Address);
                 OnIsConnectedChanged();
             }
         }
@@ -72,12 +72,12 @@
         /// parent individually via <see cref="AdviseConnect"/>.</summary>
         public override void Disconnect()
         {
-            NodeAddress parent = this.Address.Parent;
-            this.DetachFromParent();
+            NodeAddress parent = Address.Parent;
+            DetachFromParent();
             // Take a copy of the children so they disconnect at will
-            foreach (var child in this.Children.ToArray())
+            foreach (var child in Children.ToArray())
             {
-                var childNode = this.Network.FindOrCreate(child);
+                var childNode = Network.FindOrCreate(child);
                 childNode.AdviseConnect(parent);
             }
         }
@@ -86,16 +86,16 @@
         /// <param name="newParent">The parent.</param>
         public override void AdviseConnect(NodeAddress newParent)
         {
-            if (HasParent && !this.Address.Parent.Matches(newParent))
+            if (HasParent && !Address.Parent.Matches(newParent))
             {
-                this.DetachFromParent();
+                DetachFromParent();
             }
 
-            var parentNode = this.Network.FindOrCreate(newParent);
-            var actualParentAddress = parentNode.Connect(this.Address);
+            var parentNode = Network.FindOrCreate(newParent);
+            var actualParentAddress = parentNode.Connect(Address);
             if (actualParentAddress.Matches( newParent))
             {
-                this.Address.Parent = newParent;
+                Address.Parent = newParent;
                 OnIsConnectedChanged();
             }            
         }
@@ -105,7 +105,7 @@
         public override void ChildDisconnect(NodeAddress address)
         {
             Contract.Assert(Children.Any(x => x.Matches(address)));
-            this.Children.RemoveAll(x => x.Matches(address));
+            Children.RemoveAll(x => x.Matches(address));
         }
 
         /// <summary>Sends data across the network.</summary>
@@ -113,8 +113,8 @@
         /// <param name="type"><see cref="Type"/> to deserialize data back to.</param>
         public override void Send(string type, byte[] data, NodeAddress from)
         {
-            this.Network.OnReceived(type, data);
-            this.SendToNetwork(this.Network, type, data, from);
+            Network.OnReceived(type, data);
+            SendToNetwork(Network, type, data, from);
         }        
 
         public event EventHandler<EventArgs> IsConnectedChanged;
