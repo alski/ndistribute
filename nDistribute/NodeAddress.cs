@@ -18,7 +18,7 @@
 
         /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
         public NodeAddress(string schemaName, string machineName, int port)
-            : this(schemaName + ":" + machineName + ":" + port)
+            : this(schemaName + Uri.SchemeDelimiter + machineName + ":" + port)
         { }
 
         /// <summary>Gets or sets the address.</summary>

@@ -14,7 +14,7 @@
     {
         static WCFNetwork()
         {
-            SchemaName = "net-tcp";
+            SchemaName = Uri.UriSchemeNetTcp;
         }
 
         public static void Register()
@@ -88,7 +88,7 @@
 
             Service = new RemoteConnectionService { Node = _node };
             this._host = new ServiceHost(Service, new Uri(Address.Address));
-            //this._host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), RemoteConnectionService.Address.Address);
+            this._host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Address.Address);
             this._host.Open();
             Service.Node = _node;
         }
