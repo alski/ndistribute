@@ -11,10 +11,15 @@ namespace nDistribute
 {
     public class NetworkManager
     {
-        private static List<NetworkRegistration> _availableNetworks = new List<NetworkRegistration>();
-        private List<NetworkBase> _connectedNetworks = new List<NetworkBase>();
+        private static List<NetworkRegistration> availableNetworks = new List<NetworkRegistration>();
+        private List<NetworkBase> connectedNetworks = new List<NetworkBase>();
 
-        public static int FreeTcpPort()
+        internal static string GetConfiguration(NetworkBase network)
+        {
+            return network.Local.ToString() + "=" + string.Join("|", network.GetConnectionNames());
+        }
+
+        public static int FindFreeTcpPort()
         {
             var l = new TcpListener(IPAddress.Loopback, 0);
             l.Start();
@@ -26,13 +31,11 @@ namespace nDistribute
         internal bool Reconnect()
         {
             return false;
-        }
-
-        public IEnumerable<INetwork> Connections { get { return _connectedNetworks; } }
+        }      
 
         internal NetworkBase ConnectTo(string remoteAddress)
         {
-            foreach (var reg in _availableNetworks)
+            foreach (var reg in availableNetworks)
             {
                 NetworkBase result;
                 if (reg.CanCreate(remoteAddress))
@@ -40,7 +43,7 @@ namespace nDistribute
                     result = reg.CreateNetwork(remoteAddress);
                     if (result != null)
                     {
-                        _connectedNetworks.Add(result);
+                        connectedNetworks.Add(result);
                         return result;
                     }
                 }
@@ -53,7 +56,7 @@ namespace nDistribute
             if (registration == null)
                 throw new ArgumentException("Cannot register null", "registration");
 
-            _availableNetworks.Add(registration);
+            availableNetworks.Add(registration);
         }
     }
 }

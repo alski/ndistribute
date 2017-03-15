@@ -29,7 +29,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Now, FallbackValue='00:00'}" />
             <TextBox Grid.Column="1" Text="{Binding User, FallbackValue=User1}" BorderThickness="0"/>
-            <TextBox Grid.Column="2" Text="{Binding Typing}" BorderThickness="0" KeyDown="TextBox_KeyDown"/>
+            <TextBox Grid.Column="2" Text="{Binding Typing, Mode=TwoWay}" BorderThickness="0" KeyDown="TextBox_KeyDown"/>
             <Button x:Name="SendButton" VerticalContentAlignment="Center" Grid.Column="3" Padding="6,3" Command="{Binding SendCommand}">Send</Button>
         </Grid>
     </Grid>

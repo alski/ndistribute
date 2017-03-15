@@ -54,11 +54,7 @@
 
         protected void OnIsConnectedChanged()
         {
-            var temp = IsConnectedChanged;
-            if (temp != null)
-            {
-                temp(this, new ConnectedEventArgs { Connected = GetConnections().ToArray() });
-            }
+            IsConnectedChanged?.Invoke(this, new ConnectedEventArgs { Connected = GetConnections().ToArray() });
         }
 
         private IEnumerable<string> GetConnections()
@@ -112,11 +108,13 @@
         {
             var binding = new NetTcpBinding();
             if (Debugger.IsAttached)
-                binding.CloseTimeout = TimeSpan.FromMinutes(15);
+            {
+                binding.CloseTimeout = TimeSpan.FromMinutes(1);
+            }
 
             var client = new NetworkServiceClient.NodeContractClient(
-            binding,
-            new EndpointAddress(address.Address));
+                binding,
+                new EndpointAddress(address.Address));
             client.Open();
             return new WCFClientNode(client, address, this);
         }
@@ -156,5 +154,4 @@
     {
         public IEnumerable<string> Connected { get; set; }
     }
-
 }

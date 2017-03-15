@@ -20,5 +20,13 @@ namespace nDistribute.WCF.Tests.ThatNetworkManager
             connection.ShouldNotBeNull();
         }
 
+        [Test]
+        public void ShouldNotConnectIfUnregistered()
+        {
+            var manager = new NetworkManager();
+            var connection = manager.ConnectTo(WCFNetwork.SchemaName + ":xxxx");
+            connection.ShouldBeNull();
+        }
+
     }
 }

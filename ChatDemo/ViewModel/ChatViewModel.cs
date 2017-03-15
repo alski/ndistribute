@@ -22,7 +22,7 @@ namespace ChatDemo.ViewModel
             _timerTask = new Task(timerMain, TaskCreationOptions.LongRunning);
             _timerTask.Start();
 
-            _network = NetworkManager.Build();            
+            _network = NetworkManager.Build();
             _network.IsConnectedChanged += _network_IsConnectedChanged;
             _channel = _network.GetChannel<Message>();
             _channel.Received += _channel_Received;
@@ -69,10 +69,9 @@ namespace ChatDemo.ViewModel
         {
             do
             {
-                var now = DateTime.Now;
-                NotifyChanged("Now");
-
-                Thread.Sleep(1000 - now.Millisecond);
+                Now = DateTime.Now.ToLongTimeString();
+                
+                Thread.Sleep(1000 - DateTime.Now.Millisecond);
             }
             while (true);
         }
@@ -84,10 +83,15 @@ namespace ChatDemo.ViewModel
         private string _error;
         private Task _timerTask;
         private bool _isConnected;
+        private string now;
 
         public ObservableCollection<MessageViewModel> Conversation { get { return _conversation; } }
 
-        public string Now { get { return DateTime.Now.ToLongTimeString(); } }
+        public string Now
+        {
+            get { return now; }
+            set { SetAndNotifyChanged(ref now, value); }
+        }
 
         public string User
         {
@@ -118,5 +122,7 @@ namespace ChatDemo.ViewModel
         }
 
         public Command SendCommand { get; private set; }
+
+        //public ObservableCollection<string> Connections
     }
 }

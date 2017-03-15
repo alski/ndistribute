@@ -121,11 +121,7 @@
 
         protected void OnIsConnectedChanged()
         {
-            var temp = IsConnectedChanged;
-            if (temp != null)
-            {
-                temp(this, EventArgs.Empty);
-            }
+            IsConnectedChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -30,7 +30,9 @@ namespace ChatDemo
             if (e.Key == Key.Enter
                 && e.KeyboardDevice.Modifiers == ModifierKeys.None)
             {
-                ((ChatViewModel)DataContext).SendCommand.Execute(null);
+                SendButton.Focus();
+                ((ChatViewModel)SendButton.DataContext).SendCommand.Execute(null);
+                ((TextBox)sender).Focus();
             }
         } 
     }

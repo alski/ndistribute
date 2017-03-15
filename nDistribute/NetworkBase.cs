@@ -46,13 +46,11 @@ namespace nDistribute
         public INode FindOrCreate(NodeAddress address)
         {
             var found = FindOrDefault(address);
-
             if (found == null)
             {
                 found = Create(address);
                 cachedNodes.Add(found);
             }
-
             return found;
         }
 
@@ -134,6 +132,11 @@ namespace nDistribute
         private void OnChannelCreated(IChannel found)
         {
             ChannelCreated?.Invoke(this, found);
+        }
+
+        internal IEnumerable<string> GetConnectionNames()
+        {
+            return cachedNodes.Select(x=>x.Address.Address);
         }
 
     }

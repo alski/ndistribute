@@ -22,13 +22,15 @@
         }
 
         internal static Dictionary<string, InProcessNetwork> Networks = new Dictionary<string, InProcessNetwork>();
-        private string _testMemberName;
+        private string testMemberName;
 
         internal static InProcessNetwork Create(string networkName = null, [CallerMemberName] string testMethod = "")
         {
             var name = string.IsNullOrEmpty(networkName) ? testMethod : testMethod + ":" + networkName;
-            var result = new InProcessNetwork(name);
-            result._testMemberName = testMethod;
+            var result = new InProcessNetwork(name)
+            {
+                testMemberName = testMethod
+            };
             return result;
         }
 
@@ -71,8 +73,8 @@
 
         internal InProcessNetwork CreateNetwork(string newNetwork, [CallerMemberName] string networkPath = "")
         {
-            if (_testMemberName != networkPath)
-                throw new ArgumentException(string.Format("Networks should only be added inside the same test [{0} != {1}]", _testMemberName, networkPath));
+            if (testMemberName != networkPath)
+                throw new ArgumentException(string.Format("Networks should only be added inside the same test [{0} != {1}]", testMemberName, networkPath));
 
             var result = new InProcessNetwork(networkPath + "." + newNetwork);
             return result;
