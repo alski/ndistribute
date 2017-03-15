@@ -17,9 +17,9 @@
             SchemaName = Uri.UriSchemeNetTcp;
         }
 
-        public static void Register()
+        public static void Register(NetworkManager manager)
         {
-            NetworkManager.Register(
+            manager.Register(
                 new NetworkRegistration
                 {
                     CanCreate = x => x.StartsWith(SchemaName),

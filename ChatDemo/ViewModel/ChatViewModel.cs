@@ -19,7 +19,7 @@ namespace ChatDemo.ViewModel
         public ChatViewModel()
         {
             User = Environment.UserName;
-            _timerTask = new Task(timerMain, TaskCreationOptions.LongRunning);
+            _timerTask = new Task(TimerMain, TaskCreationOptions.LongRunning);
             _timerTask.Start();
 
             _network = NetworkManager.Build();
@@ -65,7 +65,7 @@ namespace ChatDemo.ViewModel
         }
 
 
-        private void timerMain()
+        private void TimerMain()
         {
             do
             {

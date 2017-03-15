@@ -26,11 +26,11 @@ namespace ChatDemo
 
             var chat = new ChatViewModel();
             DataContext = chat;
-            chat.PropertyChanged += chat_PropertyChanged;
+            chat.PropertyChanged += ChatPropertyChanged;
             chat.TryReconnect();
         }
 
-        void chat_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void ChatPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsConnected")
             {

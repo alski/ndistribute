@@ -11,14 +11,10 @@ namespace nDistribute
 {
     public class NetworkManager
     {
-        private static List<NetworkRegistration> availableNetworks = new List<NetworkRegistration>();
+        private List<NetworkRegistration> availableNetworks = new List<NetworkRegistration>();
         private List<NetworkBase> connectedNetworks = new List<NetworkBase>();
 
-        internal static string GetConfiguration(NetworkBase network)
-        {
-            return network.Local.ToString() + "=" + string.Join("|", network.GetConnectionNames());
-        }
-
+    
         public static int FindFreeTcpPort()
         {
             var l = new TcpListener(IPAddress.Loopback, 0);
@@ -51,7 +47,7 @@ namespace nDistribute
             return null;
         }
 
-        internal static void Register(NetworkRegistration registration) 
+        internal void Register(NetworkRegistration registration) 
         {
             if (registration == null)
                 throw new ArgumentException("Cannot register null", "registration");

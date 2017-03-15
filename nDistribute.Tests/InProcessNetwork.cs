@@ -11,12 +11,17 @@
     /// <summary>An in-process network.</summary>
     internal class InProcessNetwork : NetworkBase
     {
-        public static void Register()
+        static InProcessNetwork ()
         {
-            NetworkManager.Register(
+            SchemaName = "inprocess";
+        }
+
+        public static void Register(NetworkManager manager)
+        {
+            manager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.StartsWith("inprocess:"),
+                    CanCreate = x => x.StartsWith(SchemaName+":"),
                     CreateNetwork = x => new InProcessNetwork(x)
                 });
         }

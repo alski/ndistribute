@@ -134,10 +134,10 @@ namespace nDistribute
             ChannelCreated?.Invoke(this, found);
         }
 
-        internal IEnumerable<string> GetConnectionNames()
+      
+        internal string GetConfiguration()
         {
-            return cachedNodes.Select(x=>x.Address.Address);
+            return Local.Address.Address + "=" + string.Join("|", cachedNodes.Select(x => x.Address.Address));
         }
-
     }
 }
