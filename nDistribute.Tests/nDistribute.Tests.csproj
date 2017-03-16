@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InProcessTests.cs" />
+    <Compile Include="ThatNetworkManager\ConnectionsProperty.cs" />
     <Compile Include="ThatNetworkManager\ConnectToMethod.cs" />
     <Compile Include="ThatNetwork\SendMethod.cs" />
     <Compile Include="ThatNode\ConnectMethod.cs" />

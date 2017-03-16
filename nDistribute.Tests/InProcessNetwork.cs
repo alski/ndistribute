@@ -11,7 +11,7 @@
     /// <summary>An in-process network.</summary>
     internal class InProcessNetwork : NetworkBase
     {
-        static InProcessNetwork ()
+        static InProcessNetwork()
         {
             SchemaName = "inprocess";
         }
@@ -21,17 +21,18 @@
             manager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.StartsWith(SchemaName+":"),
+                    CanCreate = x => x.StartsWith(SchemaName + ":"),
                     CreateNetwork = x => new InProcessNetwork(x)
                 });
         }
 
         internal static Dictionary<string, InProcessNetwork> Networks = new Dictionary<string, InProcessNetwork>();
+
         private string testMemberName;
 
         internal static InProcessNetwork Create(string networkName = null, [CallerMemberName] string testMethod = "")
         {
-            var name = string.IsNullOrEmpty(networkName) ? testMethod : testMethod + ":" + networkName;
+            var name = string.IsNullOrEmpty(networkName) ? SchemaName + ":" + testMethod : SchemaName + ":" + testMethod + ":" + networkName;
             var result = new InProcessNetwork(name)
             {
                 testMemberName = testMethod
@@ -53,7 +54,7 @@
         internal string NetworkName { get; private set; }
 
         private void AddNetwork(InProcessNetwork network)
-        {            
+        {
             Networks.Add(network.NetworkName, this);
         }
 

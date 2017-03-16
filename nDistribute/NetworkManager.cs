@@ -13,7 +13,6 @@ namespace nDistribute
     {
         private List<NetworkRegistration> availableNetworks = new List<NetworkRegistration>();
         private List<NetworkBase> connectedNetworks = new List<NetworkBase>();
-
     
         public static int FindFreeTcpPort()
         {

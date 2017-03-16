@@ -126,7 +126,7 @@ namespace nDistribute
                 channels.Add(found);
                 OnChannelCreated(found);
             }
-            return (NetworkChannel<T>)found;
+            return found;
         }
 
         private void OnChannelCreated(IChannel found)
@@ -137,7 +137,9 @@ namespace nDistribute
       
         internal string GetConfiguration()
         {
-            return Local.Address.Address + "=" + string.Join("|", cachedNodes.Select(x => x.Address.Address));
+            return Local.Address.Address + "=" + string.Join("|", Connections);
         }
+
+        internal IEnumerable<string> Connections => cachedNodes.Select(x => x.Address.Address);
     }
 }

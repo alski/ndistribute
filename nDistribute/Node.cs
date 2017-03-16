@@ -28,7 +28,7 @@
         {
             if (Address.Address == newNode.Address)
             {
-                throw new InvalidOperationException(Address + " - Can't connect to " + newNode);
+                throw new InvalidOperationException(Address + " is my local address - Can't connect to " + newNode);
             }
 
             var parent = this as INode;
