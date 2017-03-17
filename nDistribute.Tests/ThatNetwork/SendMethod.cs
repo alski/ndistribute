@@ -29,7 +29,7 @@
             received.ShouldEqual("Hello world");
         }
 
-        [TestAttribute]
+        [Test]
         public void ShouldReceiveOnParentNetworkWhenSent()
         {
             var parentNetwork = InProcessNetwork.Create("Parent");
@@ -45,7 +45,7 @@
         }
         
 
-        [TestAttribute]
+        [Test]
         public void ShouldReceiveOnChildNetworkWhenSent()
         {
             var parentNetwork = InProcessNetwork.Create("Parent");
@@ -62,7 +62,7 @@
             received.ShouldEqual("Hello world");
         }
 
-        [TestAttribute]
+        [Test]
         public void ShouldReceiveOnAllChildNetworksWhenSent()
         {
             var parentNetwork = InProcessNetwork.Create("Parent");
