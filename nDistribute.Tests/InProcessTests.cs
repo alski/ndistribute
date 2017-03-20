@@ -9,21 +9,21 @@
         [Test]
         public void ShouldCreateLocalNode()
         {
-            var network1 = InProcessNetwork.Create("parent");
+            var network1 = InProcessNetwork.Create();
             var node1 = network1.Local;
             node1.ShouldNotBeNull();
-            node1.Address.Address.ShouldContain("parent");
+            node1.Address.Address.ShouldEqual(InProcessNetwork.SchemaName+ ":ShouldCreateLocalNode");
         }
 
         [Test]
         public void ShouldNotShareNodes()
         {
-            var network1 = InProcessNetwork.Create("1");
+            var network1 = InProcessNetwork.Create();
             var node1 = network1.Local;
             node1.ShouldNotBeType<InProcessProxyNode>();
             node1.ShouldBeType<Node>();
 
-            var network2 = network1.CreateNetwork("2");
+            var network2 = InProcessNetwork.Create("ShouldNotShareNodes2");
             var node2 = network2.Local;
             node2.ShouldNotBeType<InProcessProxyNode>();
             node2.ShouldBeType<Node>();

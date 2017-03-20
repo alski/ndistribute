@@ -47,7 +47,7 @@ namespace ChatDemo
             }
             catch (AddressAlreadyInUseException ex)
             {
-                network = new WCFNetwork(NetworkFactory.FreeTcpPort());
+                network = new WCFNetwork();
                 network.IsConnectedChanged += RememberNetwork;
                 network.Start();
             }

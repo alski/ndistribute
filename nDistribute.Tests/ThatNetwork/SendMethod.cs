@@ -32,8 +32,8 @@
         [Test]
         public void ShouldReceiveOnParentNetworkWhenSent()
         {
-            var parentNetwork = InProcessNetwork.Create("Parent");
-            var childNetwork = parentNetwork.CreateNetwork("Child");
+            var parentNetwork = InProcessNetwork.Create();
+            var childNetwork = InProcessNetwork.Create("Child");
             var parentChannel = parentNetwork.GetChannel<string>(); 
             parentNetwork.Connect(childNetwork.Local.Address);
             var childChannel = childNetwork.GetChannel<string>();
@@ -48,10 +48,10 @@
         [Test]
         public void ShouldReceiveOnChildNetworkWhenSent()
         {
-            var parentNetwork = InProcessNetwork.Create("Parent");
+            var parentNetwork = InProcessNetwork.Create();
             var parentNode = parentNetwork.Local;
             var parentChannel = parentNetwork.GetChannel<string>();
-            var childNetwork = parentNetwork.CreateNetwork("Child");
+            var childNetwork = InProcessNetwork.Create("Child");
             var childNode = childNetwork.Local;
             var childChannel = childNetwork.GetChannel<string>();
             parentNetwork.Connect(childNode.Address);
@@ -65,13 +65,13 @@
         [Test]
         public void ShouldReceiveOnAllChildNetworksWhenSent()
         {
-            var parentNetwork = InProcessNetwork.Create("Parent");
+            var parentNetwork = InProcessNetwork.Create();
             var parentNode = parentNetwork.Local;
             var parentChannel = parentNetwork.GetChannel<string>();
-            var childANetwork = parentNetwork.CreateNetwork("ChildA");
+            var childANetwork = InProcessNetwork.Create("ChildANetwork");
             var childANode = childANetwork.Local;
             var childAChannel = childANetwork.GetChannel<string>();
-            var childBNetwork = parentNetwork.CreateNetwork("ChildB");
+            var childBNetwork = InProcessNetwork.Create("ChildBNetwork");
             var childBNode = childBNetwork.Local;
             var childBChannel = childBNetwork.GetChannel<string>();
 

@@ -16,10 +16,10 @@
         {
             _network = network;
 
-            ID = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
-        public Guid ID { get; private set; }
+        public Guid Id { get; private set; }
 
         /// <summary>The connect.</summary>
         /// <param name="newNode">The new node.</param>
@@ -37,9 +37,8 @@
 
         private INode FindOriginalNode()
         {
-            var network = InProcessNetwork.Networks[Address.Address];
-            var remoteNode = new NodeAddress(network.NetworkName);
-            return network.FindOrCreate(remoteNode);
+            var network = InProcessNetwork.Networks.Single(n=>n.Local.Address == Address);
+            return network.Local;
         }
 
         /// <summary>The advise connect.</summary>

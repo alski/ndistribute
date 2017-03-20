@@ -39,7 +39,7 @@
         public void Setup()
         {
         
-            this._testNetwork = new WCFNetwork(NetworkFactory.FreeTcpPort());
+            this._testNetwork = new WCFNetwork();
             this._testNetwork.Start();
             _address = _testNetwork.Local.Address.Address;
             _testNetwork.GetChannel<RegisteredMessage>().Received += RegisteredAddressRecieved;

@@ -13,10 +13,10 @@
         [Test]
         public void ShouldUpdateSecondNetworkWithConnection()
         {
-            var network1 = InProcessNetwork.Create("1");
+            var network1 = InProcessNetwork.Create();
             var node1 = network1.Local;
 
-            var network2 = network1.CreateNetwork("2");
+            var network2 = InProcessNetwork.Create("network2");
             var node2 = network2.Local;
 
             node2.AdviseConnect(node1.Address);

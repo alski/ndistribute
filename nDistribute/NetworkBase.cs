@@ -11,7 +11,7 @@ namespace nDistribute
     {
         static NetworkBase()
         {
-            Formatter = new BinaryFormatter(); 
+            Formatter = new BinaryFormatter();
         }
 
         public static string SchemaName { get; protected set; }
@@ -31,7 +31,12 @@ namespace nDistribute
         public IEnumerable<IChannel> Channels => channels;
 
         public event EventHandler<IChannel> ChannelCreated;
-        
+
+        internal bool CanSupport(NodeAddress remoteAddress)
+        {
+            return remoteAddress.Address.StartsWith(SchemaName);
+        }
+
         public static BinaryFormatter Formatter { get; set; }
 
         /// <summary>Gets the local Node.</summary>
@@ -107,7 +112,7 @@ namespace nDistribute
                          select x).FirstOrDefault();
             if (found == null)
             {
-                found = (IChannel) Activator.CreateInstance(type, new object[] { this });
+                found = (IChannel)Activator.CreateInstance(type, new object[] { this });
                 channels.Add(found);
                 OnChannelCreated(found);
             }
@@ -134,7 +139,7 @@ namespace nDistribute
             ChannelCreated?.Invoke(this, found);
         }
 
-      
+
         internal string GetConfiguration()
         {
             return Local.Address.Address + "=" + string.Join("|", Connections);

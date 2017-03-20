@@ -14,9 +14,11 @@ namespace nDistribute.Tests.ThatNetworkManager
         [Test]
         public void ShouldConnect()
         {
+            var xxxx = InProcessNetwork.Create("xxxx");
+
             var manager = new NetworkManager();
             InProcessNetwork.Register(manager);
-            var connection = manager.ConnectTo(InProcessNetwork.SchemaName +":xxxx");
+            var connection = manager.ConnectTo(xxxx.Local.Address);
             connection.ShouldNotBeNull();
         }
 
@@ -25,7 +27,7 @@ namespace nDistribute.Tests.ThatNetworkManager
         public void ShouldNotConnectIfUnregistered()
         {
             var manager = new NetworkManager();
-            var connection = manager.ConnectTo(InProcessNetwork.SchemaName + ":xxxx");
+            var connection = manager.ConnectTo(new NodeAddress(InProcessNetwork.SchemaName + ":xxxx"));
             connection.ShouldBeNull();
         }
 

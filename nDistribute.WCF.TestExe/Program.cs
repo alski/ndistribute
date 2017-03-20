@@ -17,7 +17,7 @@ namespace nDistribute.WCF.TestExe
         {
             Debugger.Launch();
 
-            _network = new WCFNetwork(NetworkFactory.FreeTcpPort());
+            _network = new WCFNetwork();
             _network.Start();
             _network.GetChannel<OutgoingMessage>().Received += Program_Received;
             _network.Connect(new NodeAddress(args[0]));

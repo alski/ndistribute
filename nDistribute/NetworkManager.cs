@@ -28,14 +28,22 @@ namespace nDistribute
             return false;
         }      
 
-        internal NetworkBase ConnectTo(string remoteAddress)
+        internal NetworkBase ConnectTo(NodeAddress remoteAddress)
         {
+            var existing = connectedNetworks.FirstOrDefault(n => n.CanSupport(remoteAddress));
+            if (existing != null)
+            {
+                existing.Connect(remoteAddress);
+                return existing;
+            }
+
             foreach (var reg in availableNetworks)
             {
                 NetworkBase result;
                 if (reg.CanCreate(remoteAddress))
                 {
-                    result = reg.CreateNetwork(remoteAddress);
+                    result = reg.CreateNetwork();
+                    result.Connect(remoteAddress);
                     if (result != null)
                     {
                         connectedNetworks.Add(result);

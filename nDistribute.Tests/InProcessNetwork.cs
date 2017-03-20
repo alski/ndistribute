@@ -7,6 +7,7 @@
 
     using nDistribute;
     using System.Runtime.CompilerServices;
+    using System.Diagnostics.Contracts;
 
     /// <summary>An in-process network.</summary>
     internal class InProcessNetwork : NetworkBase
@@ -21,19 +22,18 @@
             manager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.StartsWith(SchemaName + ":"),
-                    CreateNetwork = x => new InProcessNetwork(x)
+                    CanCreate = x => x.Address.StartsWith(SchemaName + ":"),
+                    CreateNetwork = () => new InProcessNetwork()
                 });
         }
 
-        internal static Dictionary<string, InProcessNetwork> Networks = new Dictionary<string, InProcessNetwork>();
+        internal static List<InProcessNetwork> Networks = new List<InProcessNetwork>();
 
         private string testMemberName;
 
-        internal static InProcessNetwork Create(string networkName = null, [CallerMemberName] string testMethod = "")
+        internal static InProcessNetwork Create([CallerMemberName] string testMethod = "")
         {
-            var name = string.IsNullOrEmpty(networkName) ? SchemaName + ":" + testMethod : SchemaName + ":" + testMethod + ":" + networkName;
-            var result = new InProcessNetwork(name)
+            var result = new InProcessNetwork()
             {
                 testMemberName = testMethod
             };
@@ -41,13 +41,8 @@
         }
 
         /// <summary>Initialises a new instance of the <see cref="InProcessNetwork"/> class.</summary>
-        /// <param name="networkName">The node name.</param>
-        /// <param name="localNodeName">The local Node Name.</param>
-        /// <param name="alternateNetwork">Network to work with </param>
-        private InProcessNetwork(string networkName)
+        private InProcessNetwork()
         {
-            NetworkName = networkName;
-
             AddNetwork(this);
         }
 
@@ -55,14 +50,16 @@
 
         private void AddNetwork(InProcessNetwork network)
         {
-            Networks.Add(network.NetworkName, this);
+            Contract.Requires(!Networks.Contains(network));
+
+            Networks.Add(this);
         }
 
         /// <summary>Creates the local Node.</summary>
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode CreateLocal()
         {
-            return Create(new NodeAddress(NetworkName));
+            return new Node(new NodeAddress(InProcessNetwork.SchemaName+":"+ testMemberName), this);
         }
 
         /// <summary>The create.</summary>
@@ -70,20 +67,11 @@
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode Create(NodeAddress address)
         {
-            if (address.Address != NetworkName)
+            if (!address.Equals(Local))
             {
                 return new InProcessProxyNode(address, this);
             }
             return new Node(address, this);
-        }
-
-        internal InProcessNetwork CreateNetwork(string newNetwork, [CallerMemberName] string networkPath = "")
-        {
-            if (testMemberName != networkPath)
-                throw new ArgumentException(string.Format("Networks should only be added inside the same test [{0} != {1}]", testMemberName, networkPath));
-
-            var result = new InProcessNetwork(networkPath + "." + newNetwork);
-            return result;
         }
     }
 }

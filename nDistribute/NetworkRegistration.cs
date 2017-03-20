@@ -7,8 +7,8 @@ namespace nDistribute
 {
     public class NetworkRegistration
     {
-            public Func<string, bool> CanCreate { get; set; }
-            public Func<string, NetworkBase> CreateNetwork { get; set; }
+            public Func<NodeAddress, bool> CanCreate { get; set; }
+            public Func<NetworkBase> CreateNetwork { get; set; }
 
     }
 }

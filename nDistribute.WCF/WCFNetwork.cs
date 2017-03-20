@@ -22,22 +22,24 @@
             manager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.StartsWith(SchemaName),
-                    CreateNetwork = y => new WCFNetwork(y)
+                    CanCreate = x => x.Address.StartsWith(SchemaName),
+                    CreateNetwork = () => new WCFNetwork()
                 });
         }
 
         private ServiceHost _host;
         private Node _node;
+        private int port;
 
         /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
+        public WCFNetwork()
+            : this(NetworkManager.FindFreeTcpPort())
+        { }
+
         public WCFNetwork(int port)
             : this(new NodeAddress(SchemaName, Environment.MachineName, port))
         { }
 
-        private WCFNetwork(string serialisedEndpoint)
-            : this(new NodeAddress(serialisedEndpoint))
-        { }
 
         private WCFNetwork(NodeAddress address)
         {
@@ -46,6 +48,7 @@
             _node = new Node(address, this);
             _node.IsConnectedChanged += Node_IsConnectedChanged;
         }
+
 
         void Node_IsConnectedChanged(object sender, EventArgs e)
         {
