@@ -6,6 +6,14 @@ namespace nDistribute
     using System.Linq;
     using System.Runtime.Serialization.Formatters.Binary;
 
+    [Flags]
+    public enum StartupPolicy
+    {
+        FindNewAddressIfAlreadyInUse = 1, //0b01,
+        ReconnectPreviousAddresses = 2, //0b10,
+        Normal = FindNewAddressIfAlreadyInUse | ReconnectPreviousAddresses
+    }
+
     /// <summary>The node locator.</summary>
     public abstract class NetworkBase : INetwork
     {
@@ -20,6 +28,15 @@ namespace nDistribute
 
         private readonly Lazy<INode> localNode;
 
+        internal NetworkRegistration AsRegistration()
+        {
+            return new NetworkRegistration
+            {
+                CanCreate = this.CanCreate,
+                CreateNetwork = () => this
+            };
+        }
+
         private IList<IChannel> channels = new List<IChannel>();
 
         /// <summary>Initialises a new instance of the <see cref="NetworkBase"/> class.</summary>
@@ -32,7 +49,7 @@ namespace nDistribute
 
         public event EventHandler<IChannel> ChannelCreated;
 
-        internal bool CanSupport(NodeAddress remoteAddress)
+        internal virtual bool CanCreate(NodeAddress remoteAddress)
         {
             return remoteAddress.Address.StartsWith(SchemaName);
         }
@@ -91,11 +108,19 @@ namespace nDistribute
             Local.Connect(child);
         }
 
-        public void Connect(string address)
+        /// <summary>
+        /// Reads a previously stored configuration, 
+        /// </summary>
+        /// <param name="configuration"></param>
+        protected Tuple<string, IEnumerable<string>> ParseConfiguration(string configuration)
         {
-            Connect(new NodeAddress(address));
+            var parts = (configuration ?? "").Split('=');
+            var local = parts[0];
+            var remote = parts.Length > 1
+                ? parts[1].Split('|')
+                : Enumerable.Empty<string>();
+            return new Tuple<string, IEnumerable<string>>(local, remote);
         }
-
 
         //todo: Make this protected 
         public void OnReceived(string typeName, byte[] bytes)
@@ -142,7 +167,7 @@ namespace nDistribute
 
         internal string GetConfiguration()
         {
-            return Local.Address.Address + "=" + string.Join("|", Connections);
+            return Local.Address.ToString() + "=" + string.Join("|", Connections);
         }
 
         internal IEnumerable<string> Connections => cachedNodes.Select(x => x.Address.Address);

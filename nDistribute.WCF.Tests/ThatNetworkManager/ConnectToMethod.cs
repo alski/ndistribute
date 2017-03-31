@@ -14,12 +14,16 @@ namespace nDistribute.WCF.Tests.ThatNetworkManager
         [Test]
         public void ShouldConnect()
         {
-            var xxxx = new WCFNetwork();
-            xxxx.Start();
+            var registeredNetwork = new WCFNetwork();
+            registeredNetwork.Start();
 
             var manager = new NetworkManager();
-            WCFNetwork.Register(manager);
-            var connection = manager.ConnectTo(xxxx.Local.Address);
+            manager.Register(registeredNetwork);
+
+            var externalNetwork = new WCFNetwork();
+            externalNetwork.Start();
+
+            var connection = manager.ConnectTo(externalNetwork.Local.Address);
             connection.ShouldNotBeNull();
         }
 

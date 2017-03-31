@@ -1,4 +1,5 @@
-﻿using nDistribute.WCF;
+﻿using nDistribute;
+using nDistribute.WCF;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,44 +14,10 @@ namespace ChatDemo
     {
         public static WCFNetwork Build()
         {
-            //SettingsProperty portProperty = Properties.Settings.Default.Properties["Port"];
-            //if (portProperty == null)
-            //{
-            //    var attrs = new SettingsAttributeDictionary();
-            //    attrs.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
-            //    portProperty = new SettingsProperty("Port", typeof(int),
-            //        new LocalFileSettingsProvider(),
-            //        false,
-            //        0,
-            //        SettingsSerializeAs.String,
-            //        attrs,
-            //        false,
-            //        false);
-            //    Properties.Settings.Default.Properties.Add(portProperty);
-            //    Properties.Settings.Default.Save();
-            //}
-            var port = (int)Properties.Settings.Default["Port"];
+            WCFNetwork network = new WCFNetwork(()=> Properties.Settings.Default.WasConnectedTo);
+            network.IsConnectedChanged += RememberNetwork;
+            network.Start();
 
-            if (port == 0)
-            {
-                port = NetworkFactory.FreeTcpPort();
-                Properties.Settings.Default["Port"] = port;
-                Properties.Settings.Default.Save();
-            }
-
-            WCFNetwork network;
-            try
-            {
-               network = new WCFNetwork(port);
-                network.IsConnectedChanged += RememberNetwork;
-                network.Start();
-            }
-            catch (AddressAlreadyInUseException ex)
-            {
-                network = new WCFNetwork();
-                network.IsConnectedChanged += RememberNetwork;
-                network.Start();
-            }
             return network;
         }
 
@@ -63,7 +30,7 @@ namespace ChatDemo
                 {
                     try
                     {
-                        network.Connect(connection);
+                        network.Connect(new NodeAddress(connection));
                     }
                     catch
                     { }

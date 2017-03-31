@@ -23,6 +23,11 @@ namespace nDistribute
             return port;
         }
 
+        internal void Register(NetworkBase network)
+        {
+            Register(network.AsRegistration());
+        }
+
         internal bool Reconnect()
         {
             return false;
@@ -30,7 +35,7 @@ namespace nDistribute
 
         internal NetworkBase ConnectTo(NodeAddress remoteAddress)
         {
-            var existing = connectedNetworks.FirstOrDefault(n => n.CanSupport(remoteAddress));
+            var existing = connectedNetworks.FirstOrDefault(n => n.CanCreate(remoteAddress));
             if (existing != null)
             {
                 existing.Connect(remoteAddress);

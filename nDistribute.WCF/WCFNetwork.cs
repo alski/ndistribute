@@ -17,38 +17,32 @@
             SchemaName = Uri.UriSchemeNetTcp;
         }
 
-        public static void Register(NetworkManager manager)
-        {
-            manager.Register(
-                new NetworkRegistration
-                {
-                    CanCreate = x => x.Address.StartsWith(SchemaName),
-                    CreateNetwork = () => new WCFNetwork()
-                });
-        }
-
         private ServiceHost _host;
         private Node _node;
-        private int port;
 
         /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
-        public WCFNetwork()
-            : this(NetworkManager.FindFreeTcpPort())
-        { }
-
-        public WCFNetwork(int port)
-            : this(new NodeAddress(SchemaName, Environment.MachineName, port))
-        { }
-
-
-        private WCFNetwork(NodeAddress address)
+        public WCFNetwork(Func<string> getConfig = null, StartupPolicy startupPolicy = StartupPolicy.Normal )
         {
-            //if (RemoteConnectionService.Node != null)
-            //    throw new InvalidOperationException("WCFNetwork does not support more than one network per process in this version.");
-            _node = new Node(address, this);
-            _node.IsConnectedChanged += Node_IsConnectedChanged;
+            var config = getConfig == null ? null : getConfig();
+            var connections = ParseConfiguration(config);
+            var local = connections?.Item1 == null
+                ? new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort())
+                : new NodeAddress(connections.Item1);
+
+            StartupPolicy = startupPolicy;
+            BuildNode(local);
         }
 
+        private NodeAddress GetDefaultNode()
+        {
+            return new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort());
+        }
+
+        private void BuildNode(NodeAddress local)
+        {
+            _node = new Node(local, this);
+            _node.IsConnectedChanged += Node_IsConnectedChanged;
+        }
 
         void Node_IsConnectedChanged(object sender, EventArgs e)
         {
@@ -85,6 +79,27 @@
 
             Contract.EndContractBlock();
 
+
+            try
+            {
+                StartService();
+            }
+            catch(Exception ex)
+            {
+                if ((StartupPolicy & StartupPolicy.FindNewAddressIfAlreadyInUse) == StartupPolicy.FindNewAddressIfAlreadyInUse)
+                {
+                    BuildNode(GetDefaultNode());
+                    StartService();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private void StartService()
+        {
             Service = new RemoteConnectionService { Node = _node };
             _host = new ServiceHost(Service, new Uri(Address.Address));
             _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Address.Address);
@@ -141,6 +156,8 @@
         }
 
         public bool IsConnected { get { return Local.IsConnected; } }
+
+        public StartupPolicy StartupPolicy { get; }
 
         public event EventHandler<ConnectedEventArgs> IsConnectedChanged;
 

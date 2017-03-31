@@ -56,7 +56,7 @@ namespace ChatDemo.ViewModel
         {
             try
             {
-                _network.Connect(ConnectTo);
+                _network.Connect(new NodeAddress(ConnectTo));
             }
             catch (Exception ex)
             {
