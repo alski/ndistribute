@@ -105,7 +105,7 @@ namespace ChatDemo.ViewModel
             set { SetAndNotifyChanged(ref _typing, value); }
         }
 
-        public string ThisConnection { get { return _network.Address.Address; } }
+        public string ThisConnection { get { return _network.Local.Address.ToString(); } }
 
         public string ConnectTo { get; set; }
 

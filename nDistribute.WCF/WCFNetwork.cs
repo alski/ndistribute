@@ -18,19 +18,17 @@
         }
 
         private ServiceHost _host;
-        private Node _node;
+        private NodeAddress localAddress;
 
         /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
         public WCFNetwork(Func<string> getConfig = null, StartupPolicy startupPolicy = StartupPolicy.Normal )
+            : base(startupPolicy)
         {
             var config = getConfig == null ? null : getConfig();
             var connections = ParseConfiguration(config);
-            var local = connections?.Item1 == null
+            localAddress = connections?.Item1 == null
                 ? new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort())
-                : new NodeAddress(connections.Item1);
-
-            StartupPolicy = startupPolicy;
-            BuildNode(local);
+                : new NodeAddress(connections.Item1);;
         }
 
         private NodeAddress GetDefaultNode()
@@ -38,32 +36,17 @@
             return new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort());
         }
 
-        private void BuildNode(NodeAddress local)
+        private Node BuildNode(NodeAddress node)
         {
-            _node = new Node(local, this);
-            _node.IsConnectedChanged += Node_IsConnectedChanged;
+             var result= new Node(node, this);
+            result.IsConnectedChanged += Node_IsConnectedChanged;
+            return result;
         }
 
         void Node_IsConnectedChanged(object sender, EventArgs e)
         {
             OnIsConnectedChanged();
         }
-
-        protected void OnIsConnectedChanged()
-        {
-            IsConnectedChanged?.Invoke(this, new ConnectedEventArgs { Connected = GetConnections().ToArray() });
-        }
-
-        private IEnumerable<string> GetConnections()
-        {
-            if (_node.Address.Parent != null)
-                yield return _node.Address.Parent.Address;
-
-            foreach (var x in _node.Children)
-                yield return x.Address;
-        }
-
-        public NodeAddress Address { get { return _node.Address; } }
 
         /// <summary>Gets or sets the service.</summary>
         private RemoteConnectionService Service { get; set; }
@@ -88,7 +71,9 @@
             {
                 if ((StartupPolicy & StartupPolicy.FindNewAddressIfAlreadyInUse) == StartupPolicy.FindNewAddressIfAlreadyInUse)
                 {
-                    BuildNode(GetDefaultNode());
+                    localAddress = GetDefaultNode();
+                    ResetLocal();
+
                     StartService();
                 }
                 else
@@ -100,11 +85,11 @@
 
         private void StartService()
         {
-            Service = new RemoteConnectionService { Node = _node };
-            _host = new ServiceHost(Service, new Uri(Address.Address));
-            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Address.Address);
+            Service = new RemoteConnectionService { Node = Local as Node};
+            _host = new ServiceHost(Service, new Uri(Local.Address));
+            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Local.Address);
             _host.Open();
-            Service.Node = _node;
+            Service.Node = Local as Node;
         }
 
         private bool IsStarted()
@@ -141,8 +126,7 @@
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode CreateLocal()
         {
-            //Should never be called, but just in case....
-            return _node;
+            return BuildNode(localAddress);
         }
 
         /// <summary>
@@ -155,12 +139,7 @@
             return Local.HasChild(child);
         }
 
-        public bool IsConnected { get { return Local.IsConnected; } }
-
-        public StartupPolicy StartupPolicy { get; }
-
-        public event EventHandler<ConnectedEventArgs> IsConnectedChanged;
-
+        
         public override void Connect(NodeAddress child)
         {
             if (IsStarted() == false)
@@ -168,10 +147,5 @@
 
             base.Connect(child);
         }
-    }
-
-    public class ConnectedEventArgs : EventArgs
-    {
-        public IEnumerable<string> Connected { get; set; }
     }
 }

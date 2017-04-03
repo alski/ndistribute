@@ -36,7 +36,7 @@ namespace nDistribute.WCF.TestExe
                 new ReturnMessage
                 {
                     Message = e.Message,
-                    NodeAddress = _network.Address.Address
+                    NodeAddress = _network.Local.Address
                 });
         }
     }

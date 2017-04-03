@@ -22,7 +22,7 @@ namespace ChatDemo
         }
 
         public static void TryConnect(WCFNetwork network)
-        {
+        {       
             var wasConnectedTo = Properties.Settings.Default.WasConnectedTo;
             if (string.IsNullOrEmpty(wasConnectedTo) == false)
             {

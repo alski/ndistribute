@@ -26,7 +26,7 @@ namespace nDistribute
 
         private readonly List<INode> cachedNodes = new List<INode>();
 
-        private readonly Lazy<INode> localNode;
+        private Lazy<INode> localNode;
 
         internal NetworkRegistration AsRegistration()
         {
@@ -42,7 +42,13 @@ namespace nDistribute
         /// <summary>Initialises a new instance of the <see cref="NetworkBase"/> class.</summary>
         protected NetworkBase()
         {
-            localNode = new Lazy<INode>(BuildLocal);
+            ResetLocal();
+        }
+
+        public NetworkBase(StartupPolicy startupPolicy)
+            : this()
+        {
+            StartupPolicy = startupPolicy;
         }
 
         public IEnumerable<IChannel> Channels => channels;
@@ -94,6 +100,11 @@ namespace nDistribute
         /// <returns>The <see cref="INode"/>.</returns>
         protected abstract INode CreateLocal();
 
+        protected void ResetLocal()
+        {
+            localNode = new Lazy<INode>(BuildLocal);
+        }
+
         private INode BuildLocal()
         {
             var newNode = CreateLocal();
@@ -130,6 +141,36 @@ namespace nDistribute
             channel.OnReceived(bytes);
         }
 
+        protected void OnIsConnectedChanged()
+        {
+            IsConnectedChanged?.Invoke(this, new ConnectedEventArgs { Connected = GetConnections().ToArray() });
+
+            if (!IsConnected
+                && (StartupPolicy & StartupPolicy.ReconnectPreviousAddresses) == StartupPolicy.ReconnectPreviousAddresses)
+            {
+                foreach (var node in cachedNodes)
+                {
+                    Connect(node.Address);
+                }
+            }
+        }
+
+
+        private IEnumerable<string> GetConnections()
+        {
+            if (localNode.Value.Address.Parent != null)
+                yield return localNode.Value.Address.Parent.Address;
+
+            foreach (var x in (localNode.Value as Node)?.Children)
+                yield return x.Address;
+        }
+
+        public bool IsConnected { get { return Local.IsConnected; } }
+
+        public StartupPolicy StartupPolicy { get; }
+
+        public event EventHandler<ConnectedEventArgs> IsConnectedChanged;
+
         private IChannel GetChannel(Type type)
         {
             var found = (from x in Channels
@@ -164,12 +205,16 @@ namespace nDistribute
             ChannelCreated?.Invoke(this, found);
         }
 
-
         internal string GetConfiguration()
         {
             return Local.Address.ToString() + "=" + string.Join("|", Connections);
         }
 
         internal IEnumerable<string> Connections => cachedNodes.Select(x => x.Address.Address);
+    }
+
+    public class ConnectedEventArgs : EventArgs
+    {
+        public IEnumerable<string> Connected { get; set; }
     }
 }

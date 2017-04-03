@@ -1,6 +1,7 @@
 namespace nDistribute
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>The interface a Node should fully implement including both its remote and local operations.</summary>
     public interface INode : INodeContract
@@ -30,7 +31,7 @@ namespace nDistribute
         /// Confirms if this <see cref="INode"/> has a parent or children.
         /// </summary>
         bool IsConnected { get; }
-
+       
         void ConnectChild(INode node);
     }
 }

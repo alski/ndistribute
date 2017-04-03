@@ -57,5 +57,10 @@
             return other != null
              && Address == other.Address;
         }
+
+        public static implicit operator string(NodeAddress that)
+        {
+            return that.ToString();
+        }
     }
 }
