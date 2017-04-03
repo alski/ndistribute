@@ -26,7 +26,7 @@
         /// <returns>The <see cref="NodeAddress"/>.</returns>
         public override NodeAddress Connect(NodeAddress newNode)
         {
-            if (Address.Address == newNode.Address)
+            if (Address.AsString == newNode.AsString)
             {
                 throw new InvalidOperationException(Address + " is my local address - Can't connect to " + newNode);
             }
@@ -119,7 +119,7 @@
 
         public event EventHandler<EventArgs> IsConnectedChanged;
 
-        protected void OnIsConnectedChanged()
+        protected virtual void OnIsConnectedChanged()
         {
             IsConnectedChanged?.Invoke(this, EventArgs.Empty);
         }

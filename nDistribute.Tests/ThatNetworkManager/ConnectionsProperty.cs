@@ -23,11 +23,9 @@ namespace nDistribute.Tests.ThatNetworkManager
             var network2 = InProcessNetwork.Create("2");
             network2.Connect(network1.Local.Address);
 
-            network1.Connections.ShouldContain(network1.Local.Address.Address);
-            network1.Connections.ShouldContain(network2.Local.Address.Address);
+            network1.Connections.ShouldContain(network2.Local.Address.AsString);
 
-            network2.Connections.ShouldContain(network1.Local.Address.Address);
-            network2.Connections.ShouldContain(network2.Local.Address.Address);
+            network2.Connections.ShouldContain(network1.Local.Address.AsString);
         }
     }
 }

@@ -12,7 +12,7 @@
             var network1 = InProcessNetwork.Create();
             var node1 = network1.Local;
             node1.ShouldNotBeNull();
-            node1.Address.Address.ShouldEqual(InProcessNetwork.SchemaName+ ":ShouldCreateLocalNode");
+            node1.Address.AsString.ShouldEqual(InProcessNetwork.SchemaName+ ":ShouldCreateLocalNode");
         }
 
         [Test]

@@ -22,7 +22,7 @@
             manager.Register(
                 new NetworkRegistration
                 {
-                    CanCreate = x => x.Address.StartsWith(SchemaName + ":"),
+                    CanCreate = x => x.AsString.StartsWith(SchemaName + ":"),
                     CreateNetwork = () => new InProcessNetwork()
                 });
         }
@@ -59,7 +59,7 @@
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode CreateLocal()
         {
-            return new Node(new NodeAddress(InProcessNetwork.SchemaName+":"+ testMemberName), this);
+            return new Node(GetDefaultNode(), this);
         }
 
         /// <summary>The create.</summary>
@@ -73,5 +73,10 @@
             }
             return new Node(address, this);
         }
+
+        protected override NodeAddress GetDefaultNode()
+        {
+            return new NodeAddress(InProcessNetwork.SchemaName + ":" + testMemberName);
+        }      
     }
 }

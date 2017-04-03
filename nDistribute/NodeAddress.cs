@@ -13,7 +13,7 @@
         /// <param name="address">The address </param>
         public NodeAddress(string address)
         {
-            Address = address;
+            AsString = address;
         }
 
         /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
@@ -23,7 +23,7 @@
 
         /// <summary>Gets or sets the address.</summary>
         [DataMember]
-        public string Address { get; set; }
+        public string AsString { get; set; }
 
         /// <summary>Gets or sets the parent.</summary>
         [DataMember]
@@ -46,7 +46,7 @@
         /// <returns>The <see cref="string"/>.</returns>
         public override string ToString()
         {
-            return Address;
+            return AsString;
         }
 
         /// <summary>Checks if one matches another</summary>
@@ -55,7 +55,7 @@
         internal bool Matches(NodeAddress other)
         {
             return other != null
-             && Address == other.Address;
+             && AsString == other.AsString;
         }
 
         public static implicit operator string(NodeAddress that)

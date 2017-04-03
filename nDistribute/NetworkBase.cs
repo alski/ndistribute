@@ -24,7 +24,7 @@ namespace nDistribute
 
         public static string SchemaName { get; protected set; }
 
-        private readonly List<INode> cachedNodes = new List<INode>();
+        private readonly List<INode> connectedNodes = new List<INode>();
 
         private Lazy<INode> localNode;
 
@@ -57,7 +57,7 @@ namespace nDistribute
 
         internal virtual bool CanCreate(NodeAddress remoteAddress)
         {
-            return remoteAddress.Address.StartsWith(SchemaName);
+            return remoteAddress.AsString.StartsWith(SchemaName);
         }
 
         public static BinaryFormatter Formatter { get; set; }
@@ -77,7 +77,7 @@ namespace nDistribute
             if (found == null)
             {
                 found = Create(address);
-                cachedNodes.Add(found);
+                connectedNodes.Add(found);
             }
             return found;
         }
@@ -87,7 +87,7 @@ namespace nDistribute
         /// <returns>The found <see cref="Node"/> or null.</returns>
         public INode FindOrDefault(NodeAddress address)
         {
-            var found = (from x in cachedNodes where x.Address.Matches(address) select x).FirstOrDefault();
+            var found = (from x in connectedNodes where x.Address.Matches(address) select x).FirstOrDefault();
             return found;
         }
 
@@ -102,16 +102,11 @@ namespace nDistribute
 
         protected void ResetLocal()
         {
-            localNode = new Lazy<INode>(BuildLocal);
+            localNode = new Lazy<INode>(CreateLocal);
         }
 
-        private INode BuildLocal()
-        {
-            var newNode = CreateLocal();
-            cachedNodes.Add(newNode);
-            return newNode;
-        }
-
+        protected abstract NodeAddress GetDefaultNode();
+       
         /// <summary>Add a node to the network.</summary>
         /// <param name="child">The child.</param>
         public virtual void Connect(NodeAddress child)
@@ -148,7 +143,7 @@ namespace nDistribute
             if (!IsConnected
                 && (StartupPolicy & StartupPolicy.ReconnectPreviousAddresses) == StartupPolicy.ReconnectPreviousAddresses)
             {
-                foreach (var node in cachedNodes)
+                foreach (var node in connectedNodes)
                 {
                     Connect(node.Address);
                 }
@@ -159,10 +154,10 @@ namespace nDistribute
         private IEnumerable<string> GetConnections()
         {
             if (localNode.Value.Address.Parent != null)
-                yield return localNode.Value.Address.Parent.Address;
+                yield return localNode.Value.Address.Parent.AsString;
 
             foreach (var x in (localNode.Value as Node)?.Children)
-                yield return x.Address;
+                yield return x.AsString;
         }
 
         public bool IsConnected { get { return Local.IsConnected; } }
@@ -210,7 +205,7 @@ namespace nDistribute
             return Local.Address.ToString() + "=" + string.Join("|", Connections);
         }
 
-        internal IEnumerable<string> Connections => cachedNodes.Select(x => x.Address.Address);
+        internal IEnumerable<string> Connections => connectedNodes.Select(x => x.Address.AsString);
     }
 
     public class ConnectedEventArgs : EventArgs

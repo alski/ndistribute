@@ -41,7 +41,7 @@
         
             this._testNetwork = new WCFNetwork();
             this._testNetwork.Start();
-            _address = _testNetwork.Local.Address.Address;
+            _address = _testNetwork.Local.Address.AsString;
             _testNetwork.GetChannel<RegisteredMessage>().Received += RegisteredAddressRecieved;
             this._testOutgoing = _testNetwork.GetChannel<OutgoingMessage>();
             this._testReturn = _testNetwork.GetChannel<ReturnMessage>();

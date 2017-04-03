@@ -21,26 +21,19 @@
         private NodeAddress localAddress;
 
         /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
-        public WCFNetwork(Func<string> getConfig = null, StartupPolicy startupPolicy = StartupPolicy.Normal )
+        public WCFNetwork(Func<string> getConfig = null, StartupPolicy startupPolicy = StartupPolicy.Normal)
             : base(startupPolicy)
         {
             var config = getConfig == null ? null : getConfig();
             var connections = ParseConfiguration(config);
             localAddress = connections?.Item1 == null
                 ? new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort())
-                : new NodeAddress(connections.Item1);;
+                : new NodeAddress(connections.Item1); ;
         }
 
-        private NodeAddress GetDefaultNode()
+        protected override NodeAddress GetDefaultNode()
         {
             return new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort());
-        }
-
-        private Node BuildNode(NodeAddress node)
-        {
-             var result= new Node(node, this);
-            result.IsConnectedChanged += Node_IsConnectedChanged;
-            return result;
         }
 
         void Node_IsConnectedChanged(object sender, EventArgs e)
@@ -67,7 +60,7 @@
             {
                 StartService();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if ((StartupPolicy & StartupPolicy.FindNewAddressIfAlreadyInUse) == StartupPolicy.FindNewAddressIfAlreadyInUse)
                 {
@@ -85,9 +78,9 @@
 
         private void StartService()
         {
-            Service = new RemoteConnectionService { Node = Local as Node};
-            _host = new ServiceHost(Service, new Uri(Local.Address));
-            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Local.Address);
+            Service = new RemoteConnectionService { Node = Local as Node };
+            _host = new ServiceHost(Service, new Uri(Local.Address.AsString));
+            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Local.Address.AsString);
             _host.Open();
             Service.Node = Local as Node;
         }
@@ -117,7 +110,7 @@
 
             var client = new NetworkServiceClient.NodeContractClient(
                 binding,
-                new EndpointAddress(address.Address));
+                new EndpointAddress(address.AsString));
             client.Open();
             return new WCFClientNode(client, address, this);
         }
@@ -126,7 +119,10 @@
         /// <returns>The <see cref="INode"/>.</returns>
         protected override INode CreateLocal()
         {
-            return BuildNode(localAddress);
+            var result = new Node(GetDefaultNode(), this);
+            result.IsConnectedChanged += Node_IsConnectedChanged;
+            return result;
+
         }
 
         /// <summary>
@@ -139,7 +135,7 @@
             return Local.HasChild(child);
         }
 
-        
+
         public override void Connect(NodeAddress child)
         {
             if (IsStarted() == false)

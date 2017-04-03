@@ -10,20 +10,20 @@ namespace nDistribute.WCF.TestExe
 {
     class Program
     {
-        static WCFNetwork _network;
+        static WCFNetwork network;
         static NetworkChannel<ReturnMessage> _returnChannel;
 
         static void Main(string[] args)
         {
             Debugger.Launch();
 
-            _network = new WCFNetwork();
-            _network.Start();
-            _network.GetChannel<OutgoingMessage>().Received += Program_Received;
-            _network.Connect(new NodeAddress(args[0]));
-            _network.GetChannel<RegisteredMessage>().Send(new RegisteredMessage { Address = _network.Local.Address.Address });
+            network = new WCFNetwork();
+            network.Start();
+            network.GetChannel<OutgoingMessage>().Received += Program_Received;
+            network.Connect(new NodeAddress(args[0]));
+            network.GetChannel<RegisteredMessage>().Send(new RegisteredMessage { Address = network.Local.Address.AsString });
 
-            _returnChannel = _network.GetChannel<ReturnMessage>();
+            _returnChannel = network.GetChannel<ReturnMessage>();
             //You should never see this, but just in case
             Console.WriteLine("Press any key to terminate");
             Console.ReadKey();
@@ -36,7 +36,7 @@ namespace nDistribute.WCF.TestExe
                 new ReturnMessage
                 {
                     Message = e.Message,
-                    NodeAddress = _network.Local.Address
+                    NodeAddress = network.Local.Address.AsString
                 });
         }
     }
