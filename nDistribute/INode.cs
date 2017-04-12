@@ -1,8 +1,5 @@
 namespace nDistribute
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>The interface a Node should fully implement including both its remote and local operations.</summary>
     public interface INode : INodeContract
     {
@@ -11,6 +8,11 @@ namespace nDistribute
 
         /// <summary>Gets a value indicating whether has parent.</summary>
         bool HasParent { get; }
+        
+        /// <summary>
+        /// Gets a value indicating whether this Node has a parent or children on the network.
+        /// </summary>
+        bool IsConnected { get; }
 
         /// <summary>The has child.</summary>
         /// <param name="address">The address.</param>
@@ -22,16 +24,15 @@ namespace nDistribute
 
         /// <summary>Collaborates with a network to send data around it.</summary>
         /// <param name="network">The network.</param>
-        /// <param name="data">The data.</param>
         /// <param name="type"><see cref="Type"/> to deserialize data back to.</param>
+        /// <param name="data">The data.</param>
         /// <param name="from">Where not to send the data back to.</param>
         void SendToNetwork(INetwork network, string type, byte[] data, NodeAddress from);
 
         /// <summary>
-        /// Confirms if this <see cref="INode"/> has a parent or children.
+        /// Connects a node to my network as a child of this node.
         /// </summary>
-        bool IsConnected { get; }
-       
+        /// <param name="node">The node to connect.</param>
         void ConnectChild(INode node);
     }
 }

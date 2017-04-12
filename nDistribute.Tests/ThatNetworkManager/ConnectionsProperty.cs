@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using Should;
-
-namespace nDistribute.Tests.ThatNetworkManager
+﻿namespace nDistribute.Tests.ThatNetworkManager
 {
+    using NUnit.Framework;
+    using Should;
+
+    /// <summary>
+    /// Tests for <see cref="INetwork.Connections"/>
+    /// </summary>
     [TestFixture]
     public class ConnectionsProperty
     {
+        /// <summary>
+        /// The connections property should include a connected node name
+        /// </summary>
         [Test]
         public void ShouldIncludeAConnectedNodeName()
         {

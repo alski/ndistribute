@@ -1,26 +1,25 @@
 ﻿namespace nDistribute.WCF
 {
     using System;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
-    using System.ServiceModel;
-
-    using nDistribute;
-    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.Contracts;
+    using System.ServiceModel;
+    using nDistribute;
 
     /// <summary>A network that uses WCF as an underlying transport.</summary>
     public class WCFNetwork : NetworkBase
     {
+        private ServiceHost host;
+        private NodeAddress localAddress;
+
         static WCFNetwork()
         {
             SchemaName = Uri.UriSchemeNetTcp;
         }
 
-        private ServiceHost _host;
-        private NodeAddress localAddress;
-
-        /// <summary>Initialises a new instance of the <see cref="WCFNetwork"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="WCFNetwork"/> class.</summary>
+        /// <param name="getConfig">Means of getting configuration for reconnecting with.</param>
+        /// <param name="startupPolicy"><see cref="StartupPolicy"/> defining how we startup.</param>
         public WCFNetwork(Func<string> getConfig = null, StartupPolicy startupPolicy = StartupPolicy.Normal)
             : base(startupPolicy)
         {
@@ -28,17 +27,7 @@
             var connections = ParseConfiguration(config);
             localAddress = connections?.Item1 == null
                 ? new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort())
-                : new NodeAddress(connections.Item1); ;
-        }
-
-        protected override NodeAddress GetDefaultNode()
-        {
-            return new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort());
-        }
-
-        void Node_IsConnectedChanged(object sender, EventArgs e)
-        {
-            OnIsConnectedChanged();
+                : new NodeAddress(connections.Item1); 
         }
 
         /// <summary>Gets or sets the service.</summary>
@@ -55,12 +44,11 @@
 
             Contract.EndContractBlock();
 
-
             try
             {
                 StartService();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if ((StartupPolicy & StartupPolicy.FindNewAddressIfAlreadyInUse) == StartupPolicy.FindNewAddressIfAlreadyInUse)
                 {
@@ -76,25 +64,38 @@
             }
         }
 
-        private void StartService()
+        /// <inheritdoc/>
+        public override void Connect(NodeAddress child)
         {
-            Service = new RemoteConnectionService { Node = Local as Node };
-            _host = new ServiceHost(Service, new Uri(Local.Address.AsString));
-            _host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Local.Address.AsString);
-            _host.Open();
-            Service.Node = Local as Node;
+            if (IsStarted() == false)
+            {
+                Start();
+            }
+
+            base.Connect(child);
         }
 
-        private bool IsStarted()
+        /// <summary>
+        /// Used in unit testing only.
+        /// </summary>
+        /// <param name="child">The node we expect to have as a child.</param>
+        /// <returns>Whether we have the given address as a child.</returns>
+        internal bool HasChild(NodeAddress child)
         {
-            return _host != null;
+            return Local.HasChild(child);
         }
 
         /// <summary>Stops the WCF host.</summary>
         internal void Stop()
         {
-            _host.Close();
-            _host = null;
+            host.Close();
+            host = null;
+        }
+
+        /// <inheritdoc/>
+        protected override NodeAddress GetDefaultNode()
+        {
+            return new NodeAddress(SchemaName, Environment.MachineName, NetworkManager.FindFreeTcpPort());
         }
 
         /// <summary>Creates nodes representing other nodes.</summary>
@@ -122,26 +123,25 @@
             var result = new Node(GetDefaultNode(), this);
             result.IsConnectedChanged += Node_IsConnectedChanged;
             return result;
-
         }
 
-        /// <summary>
-        /// Used in unit testing only.
-        /// </summary>
-        /// <param name="child"></param>
-        /// <returns></returns>
-        internal bool HasChild(NodeAddress child)
+        private void Node_IsConnectedChanged(object sender, EventArgs e)
         {
-            return Local.HasChild(child);
+            OnIsConnectedChanged();
         }
 
-
-        public override void Connect(NodeAddress child)
+        private void StartService()
         {
-            if (IsStarted() == false)
-                Start();
-
-            base.Connect(child);
+            Service = new RemoteConnectionService { Node = Local as Node };
+            host = new ServiceHost(Service, new Uri(Local.Address.AsString));
+            host.AddServiceEndpoint(typeof(INodeContract), new NetTcpBinding(), Local.Address.AsString);
+            host.Open();
+            Service.Node = Local as Node;
         }
+
+        private bool IsStarted()
+        {
+            return host != null;
+        } 
     }
 }

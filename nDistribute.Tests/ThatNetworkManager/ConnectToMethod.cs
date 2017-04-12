@@ -1,16 +1,17 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Should;
-
-namespace nDistribute.Tests.ThatNetworkManager
+﻿namespace nDistribute.Tests.ThatNetworkManager
 {
+    using NUnit.Framework;
+    using Should;
+
+    /// <summary>
+    /// Tests for <see cref="NetworkManager.ConnectTo(NodeAddress)"/>
+    /// </summary>
     [TestFixture]
     public class ConnectToMethod
     {
+        /// <summary>
+        /// Tests that the ConnectTo method returns a connection.
+        /// </summary>
         [Test]
         public void ShouldConnect()
         {
@@ -22,7 +23,9 @@ namespace nDistribute.Tests.ThatNetworkManager
             connection.ShouldNotBeNull();
         }
 
-
+        /// <summary>
+        /// Should not connect if unregistered.
+        /// </summary>
         [Test]
         public void ShouldNotConnectIfUnregistered()
         {
@@ -30,6 +33,5 @@ namespace nDistribute.Tests.ThatNetworkManager
             var connection = manager.ConnectTo(new NodeAddress(InProcessNetwork.SchemaName + ":xxxx"));
             connection.ShouldBeNull();
         }
-
     }
 }

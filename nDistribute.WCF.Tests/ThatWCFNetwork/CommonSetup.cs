@@ -1,29 +1,34 @@
 ﻿namespace nDistribute.WCF.Tests.ThatWCFNetwork
 {
-    using System.Diagnostics.CodeAnalysis;
-
-    using NUnit.Framework;
-
-    using Should;
-    using nDistribute.WCF;
-    using System.Diagnostics;
     using System;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using nDistribute.WCF;
     using nDistribute.WCF.TestExe.Model;
-    using System.Threading;
+    using NUnit.Framework;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Testing code.")]
     public class CommonSetup
     {
-        protected WCFNetwork _testNetwork;
-        protected NetworkChannel<OutgoingMessage> _testOutgoing;
-        protected NetworkChannel<ReturnMessage> _testReturn;
-        protected Process _test2Process;
-        protected Process _test3Process;
-        protected string _address;
-        protected Process _test2_1Process;
-        protected NodeAddress _test2Address;
-        protected NodeAddress _test3Address;
-        protected NodeAddress _test2_1Address;
+        protected WCFNetwork TestNetwork { get; set; }
+
+        protected NetworkChannel<OutgoingMessage> TestOutgoing { get; set; }
+
+        protected NetworkChannel<ReturnMessage> TestReturn { get; set; }
+
+        protected Process Test2Process { get; set; }
+
+        protected Process Test3Process { get; set; }
+
+        protected string Address { get; set; }
+
+        protected Process Test2_1Process { get; set; }
+
+        protected NodeAddress Test2Address { get; set; }
+
+        protected NodeAddress Test3Address { get; set; }
+
+        protected NodeAddress Test2_1Address { get; set; }
 
         /// <summary>
         /// Trying to set up a network that look likes
@@ -37,49 +42,45 @@
         /// </summary>
         //[TestFixtureSetUp]
         public void Setup()
-        {
-        
-            this._testNetwork = new WCFNetwork();
-            this._testNetwork.Start();
-            _address = _testNetwork.Local.Address.AsString;
-            _testNetwork.GetChannel<RegisteredMessage>().Received += RegisteredAddressRecieved;
-            this._testOutgoing = _testNetwork.GetChannel<OutgoingMessage>();
-            this._testReturn = _testNetwork.GetChannel<ReturnMessage>();
+        {        
+            this.TestNetwork = new WCFNetwork();
+            this.TestNetwork.Start();
+            Address = TestNetwork.Local.Address.AsString;
+            TestNetwork.GetChannel<RegisteredMessage>().Received += RegisteredAddressRecieved;
+            this.TestOutgoing = TestNetwork.GetChannel<OutgoingMessage>();
+            this.TestReturn = TestNetwork.GetChannel<ReturnMessage>();
 
             Debug.WriteLine(Environment.CurrentDirectory);
-            _test2Process = Process.Start("nDistribute.WCF.TestExe.exe", _address);
-            //_test3Process = Process.Start("nDistribute.WCF.TestExe.exe", _address);
-
+            Test2Process = Process.Start("nDistribute.WCF.TestExe.exe", Address);
         }
 
-        void RegisteredAddressRecieved(object sender, RegisteredMessage e)
+        [OneTimeTearDown]
+        public void Teardown()
+        {
+            Test2Process.Kill();
+        }
+
+        private void RegisteredAddressRecieved(object sender, RegisteredMessage e)
         {
             switch (e.Name)
             {
                 case "test2":
-                    _test2Address = e.ToAddress();
+                    Test2Address = e.ToAddress();
                     break;
 
                 case "test3":
-                    _test3Address = e.ToAddress();
+                    Test3Address = e.ToAddress();
                     break;
 
                 case "test2_1":
-                    _test2_1Address = e.ToAddress();
-                    if (_test2_1Process == null)
-                        _test2_1Process = Process.Start(".\nDistribute.WCF.TestExe.exe", "test2_1 " + _address);
+                    Test2_1Address = e.ToAddress();
+                    if (Test2_1Process == null)
+                    {
+                        Test2_1Process = Process.Start(".\nDistribute.WCF.TestExe.exe", "test2_1 " + Address);
+                    }
+
                     break;
             }
         }
-
-        [TestFixtureTearDown]
-        public void Teardown()
-        {
-            _test2Process.Kill();
-            //_test3Process.Kill();
-            //if (_test2_1Process != null)
-            //    _test2_1Process.Kill();
-        }
-
     }
 }

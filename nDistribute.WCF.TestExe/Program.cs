@@ -1,19 +1,22 @@
-﻿using nDistribute.WCF.TestExe.Model;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace nDistribute.WCF.TestExe
+﻿namespace nDistribute.WCF.TestExe
 {
-    class Program
-    {
-        static WCFNetwork network;
-        static NetworkChannel<ReturnMessage> _returnChannel;
+    using System;
+    using System.Diagnostics;
+    using nDistribute.WCF.TestExe.Model;
 
-        static void Main(string[] args)
+    /// <summary>
+    /// Program for testing
+    /// </summary>
+    public class Program
+    {
+        private static WCFNetwork network;
+        private static NetworkChannel<ReturnMessage> returnChannel;
+
+        /// <summary>
+        /// Main method for simple test exe
+        /// </summary>
+        /// <param name="args">Startup arguments.</param>
+        public static void Main(string[] args)
         {
             Debugger.Launch();
 
@@ -23,16 +26,17 @@ namespace nDistribute.WCF.TestExe
             network.Connect(new NodeAddress(args[0]));
             network.GetChannel<RegisteredMessage>().Send(new RegisteredMessage { Address = network.Local.Address.AsString });
 
-            _returnChannel = network.GetChannel<ReturnMessage>();
+            returnChannel = network.GetChannel<ReturnMessage>();
+            
             //You should never see this, but just in case
             Console.WriteLine("Press any key to terminate");
             Console.ReadKey();
         }
 
-        static void Program_Received(object sender, OutgoingMessage e)
+        private static void Program_Received(object sender, OutgoingMessage e)
         {
             Console.WriteLine("Received outgoing: " + e.Message);
-            _returnChannel.Send(
+            returnChannel.Send(
                 new ReturnMessage
                 {
                     Message = e.Message,

@@ -1,15 +1,11 @@
 ﻿namespace nDistribute
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>The node without contract.</summary>
     public abstract class NodeWithoutContract : INode
-    {
-        /// <summary>The _children.</summary>
-        protected internal readonly List<NodeAddress> Children = new List<NodeAddress>();
-
+    {        
         /// <summary>Gets or sets the address.</summary>
         public NodeAddress Address { get; protected set; }
 
@@ -18,6 +14,17 @@
         {
             get { return Address.Parent != null; }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this node is connected to others.
+        /// </summary>
+        public bool IsConnected
+        {
+            get { return Address.Parent != null || Children.Any(); }
+        }
+    
+        /// <summary>Gets the children.</summary>
+        protected internal List<NodeAddress> Children { get; } = new List<NodeAddress>();
 
         /// <summary>Gets or sets the <see cref="INetwork"/>.</summary>
         protected INetwork Network { get; set; }
@@ -41,7 +48,8 @@
         /// This could mean that this node actually becomes the child of a completely different node, for example when the 
         /// node we asked is already full and delegates us to its child. Alternatively it could decide that we shouldn't be anyone's child,
         /// so it will attempt to connect to us by calling our <see cref="INodeContract.Connect"/> instead.</remarks>
-        /// <param name="newNode">The new node.</param>        
+        /// <param name="newNode">The node we think we want to connect to.</param>
+        /// <returns>The node we actually did connect to.</returns>        
         public abstract NodeAddress Connect(NodeAddress newNode);
 
         /// <summary>Send advise to another node of who it should connect to.</summary>
@@ -56,28 +64,18 @@
         public abstract void ChildDisconnect(NodeAddress address);
 
         /// <summary>Sends data across the network.</summary>
-        /// <param name="from">Where not to send data back to.</param>
-        /// <param name="data">The data.</param>
         /// <param name="type"><see cref="Type"/> that the data should be deserialized to.</param>
+        /// <param name="data">The data.</param>
+        /// <param name="from">Where not to send data back to.</param>
         public abstract void Send(string type, byte[] data, NodeAddress from);
 
-        /// <summary>Detaches this node from its parent.</summary>
-        /// <returns>The <see cref="bool"/>.</returns>
-        protected void DetachFromParent()
-        {
-            var parent = Address.Parent;
-            var parentNode = Network.FindOrCreate(parent);
-            parentNode.ChildDisconnect(Address);
-            Address.Parent = null;
-        }
-
-        /// <summary>Registers a child node.</summary>
-        /// <param name="address">The address.</param>
-        protected void AddChild(NodeAddress address)
-        {
-            Children.Add(address);
-        }
-
+        /// <summary>
+        /// Sends some data to the entire network.
+        /// </summary>
+        /// <param name="network">Where to send the data.</param>
+        /// <param name="type">Type of data to send.</param>
+        /// <param name="data">Untyped data to send.</param>
+        /// <param name="from">Where this data originates from.</param>
         public void SendToNetwork(INetwork network, string type, byte[] data, NodeAddress from)
         {
             var recipient = network.FindOrDefault(Address.Parent);
@@ -95,10 +93,28 @@
                     recipient.Send(type, data, Address);
                 }
             }
+        }     
+
+        /// <summary>
+        /// Connects a child node to this one.
+        /// </summary>
+        /// <param name="node">Child to connect.</param>
+        public abstract void ConnectChild(INode node);
+
+        /// <summary>Detaches this node from its parent.</summary>
+        protected void DetachFromParent()
+        {
+            var parent = Address.Parent;
+            var parentNode = Network.FindOrCreate(parent);
+            parentNode.ChildDisconnect(Address);
+            Address.Parent = null;
         }
 
-        public bool IsConnected { get { return Address.Parent != null || Children.Any(); } }
-
-        public abstract void ConnectChild(INode node);
+        /// <summary>Registers a child node.</summary>
+        /// <param name="address">The address.</param>
+        protected void AddChild(NodeAddress address)
+        {
+            Children.Add(address);
+        }
     }
 }

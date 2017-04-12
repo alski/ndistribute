@@ -38,4 +38,3 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("nDistribute.Tests")]
 [assembly: InternalsVisibleTo("nDistribute.WCF")]
 [assembly: InternalsVisibleTo("nDistribute.WCF.Tests")]
-

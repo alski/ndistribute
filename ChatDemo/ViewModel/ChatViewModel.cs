@@ -1,62 +1,116 @@
-﻿using nDistribute.WCF;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using nDistribute;
-using demoMVVM;
-
-namespace ChatDemo.ViewModel
+﻿namespace ChatDemo.ViewModel
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using demoMVVM;
+    using nDistribute;
+    using nDistribute.WCF;
+
+    /// <summary>
+    /// A viewModel for chat
+    /// </summary>
     public class ChatViewModel : ViewModelBase
     {
-        private WCFNetwork _network;
-        private NetworkChannel<Message> _channel;
+        private WCFNetwork network;
+        private NetworkChannel<Message> channel;
+        private string user;
+        private string typing;
+        private string error;
+        private Task timerTask;
+        private bool isConnected;
+        private string now;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ChatViewModel"/> class.
+        /// </summary>
         public ChatViewModel()
         {
             User = Environment.UserName;
-            _timerTask = new Task(TimerMain, TaskCreationOptions.LongRunning);
-            _timerTask.Start();
+            timerTask = new Task(TimerMain, TaskCreationOptions.LongRunning);
+            timerTask.Start();
 
-            _network = NetworkManager.Build();
-            _network.IsConnectedChanged += _network_IsConnectedChanged;
-            _channel = _network.GetChannel<Message>();
-            _channel.Received += _channel_Received;
+            network = WCFNetworkManager.Build();
+            network.IsConnectedChanged += NetworkIsConnectedChanged;
+            channel = network.GetChannel<Message>();
+            channel.Received += ChannelReceived;
             SendCommand = new Command { CanExecuteFunc = x => true, ExecuteAction = x => SendMessage() };
         }
 
-        public void TryReconnect()
+        /// <summary>
+        /// Gets the collection of <see cref="MessageViewModel"/> that makes a conversation
+        /// </summary>
+        public ObservableCollection<MessageViewModel> Conversation { get; } = new ObservableCollection<MessageViewModel>();
+
+        /// <summary>
+        /// Gets or sets current time. Used so we can show dynamic behaviour in the demo,.
+        /// </summary>
+        public string Now
         {
-            NetworkManager.TryConnect(_network);
+            get { return now; }
+            set { SetAndNotifyChanged(ref now, value); }
         }
 
-        void _channel_Received(object sender, Message e)
+        /// <summary>
+        /// Gets or sets and sets the user.
+        /// </summary>
+        public string User
         {
-            _conversation.Add(new MessageViewModel(e, false));
+            get { return user; }
+            set { SetAndNotifyChanged(ref user, value); }
         }
 
-        private void SendMessage()
+        /// <summary>
+        /// Gets or sets the current set of characters not yet sent as a message.
+        /// </summary>
+        public string Typing
         {
-            var message = new Message(DateTime.UtcNow, User, Typing);
-            _channel.Send(message);
-            Typing = string.Empty;
-            _conversation.Add(new MessageViewModel(message, true));
+            get { return typing; }
+            set { SetAndNotifyChanged(ref typing, value); }
         }
 
-        private void _network_IsConnectedChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Gets the connection as an address of the local node on the network.
+        /// </summary>
+        public string ThisConnection => network.Local.Address.ToString();
+
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        public string ConnectTo { get; set; }
+
+        /// <summary>
+        /// Gets and sets the current error state.
+        /// </summary>
+        public string Error
         {
-            IsConnected = _network.IsConnected;            
+            get { return error; }
+            private set { SetAndNotifyChanged(ref error, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the application is connected to the network.
+        /// </summary>
+        public bool IsConnected
+        {
+            get { return isConnected; }
+            set { SetAndNotifyChanged(ref isConnected, value); }
+        }
+
+        /// <summary>
+        /// Gets the command to Send the <see cref="Message"/> to the network.
+        /// </summary>
+        public Command SendCommand { get; private set; }
+
+        /// <summary>
+        /// Connects to the network or sets <see cref="Error"/> with the reason why not.
+        /// </summary>
         public void Connect()
         {
             try
             {
-                _network.Connect(new NodeAddress(ConnectTo));
+                network.Connect(new NodeAddress(ConnectTo));
             }
             catch (Exception ex)
             {
@@ -64,6 +118,31 @@ namespace ChatDemo.ViewModel
             }
         }
 
+        /// <summary>
+        /// Try to reconnect
+        /// </summary>
+        public void TryReconnect()
+        {
+            WCFNetworkManager.TryConnect(network);
+        }
+
+        private void ChannelReceived(object sender, Message e)
+        {
+            Conversation.Add(new MessageViewModel(e, false));
+        }
+
+        private void SendMessage()
+        {
+            var message = new Message(DateTime.UtcNow, User, Typing);
+            channel.Send(message);
+            Typing = string.Empty;
+            Conversation.Add(new MessageViewModel(message, true));
+        }
+
+        private void NetworkIsConnectedChanged(object sender, EventArgs e)
+        {
+            IsConnected = network.IsConnected;            
+        }
 
         private void TimerMain()
         {
@@ -74,55 +153,6 @@ namespace ChatDemo.ViewModel
                 Thread.Sleep(1000 - DateTime.Now.Millisecond);
             }
             while (true);
-        }
-
-        private ObservableCollection<MessageViewModel> _conversation = new ObservableCollection<MessageViewModel>();
-
-        private string _user;
-        private string _typing;
-        private string _error;
-        private Task _timerTask;
-        private bool _isConnected;
-        private string now;
-
-        public ObservableCollection<MessageViewModel> Conversation { get { return _conversation; } }
-
-        public string Now
-        {
-            get { return now; }
-            set { SetAndNotifyChanged(ref now, value); }
-        }
-
-        public string User
-        {
-            get { return _user; }
-            set { SetAndNotifyChanged(ref _user, value); }
-        }
-
-        public string Typing
-        {
-            get { return _typing; }
-            set { SetAndNotifyChanged(ref _typing, value); }
-        }
-
-        public string ThisConnection { get { return _network.Local.Address.ToString(); } }
-
-        public string ConnectTo { get; set; }
-
-        public string Error
-        {
-            get { return _error; }
-            private set { SetAndNotifyChanged(ref _error, value); }
-        }
-
-        public bool IsConnected
-        {
-            get { return _isConnected; }
-            set { SetAndNotifyChanged(ref _isConnected, value); }
-        }
-
-        public Command SendCommand { get; private set; }
-
-        //public ObservableCollection<string> Connections
+        }      
     }
 }

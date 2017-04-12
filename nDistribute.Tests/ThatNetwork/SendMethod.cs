@@ -19,6 +19,7 @@
             var child = childNetwork.Local.Address;
             network.Connect(child);
             var channel = network.GetChannel<string>();
+            
             //Call this to prevent test failure with Can't find constructor on type string
             var childChannel = childNetwork.GetChannel<string>();
             var childNode = network.FindOrDefault(child);
@@ -43,7 +44,6 @@
             childChannel.Send("Hello world");
             received.ShouldEqual("Hello world");
         }
-        
 
         [Test]
         public void ShouldReceiveOnChildNetworkWhenSent()

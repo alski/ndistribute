@@ -9,7 +9,8 @@
     [DebuggerDisplay("{Address}")]
     public class Node : NodeWithoutContract
     {
-        /// <summary>Initialises a new instance of the <see cref="Node"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Node"/> class.</summary>
         /// <remarks>You can't call this, instead use <see cref="INetwork.FindOrCreate"/> which will create and track nodes for you  </remarks>
         /// <param name="newAddress">The new address.</param>
         /// <param name="locator">The locator used to connect to other nodes.</param>
@@ -19,6 +20,11 @@
             Network = locator;
             ElectionStrategy = new FirstComeFirstElectedStrategy();
         }
+
+        /// <summary>
+        /// Event for when the connection status changes.
+        /// </summary>
+        public event EventHandler<EventArgs> IsConnectedChanged;
 
         /// <summary>Connects with a new node, by determining which is the parent.</summary>
         /// <remarks>Delegates to the <see cref="NodeWithoutContract.ElectionStrategy"/> to confirm if we should be the parent of the node.</remarks>
@@ -46,6 +52,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override void ConnectChild(INode child)
         {
             Contract.Assert(child.Address.Matches(Address.Parent) == false);
@@ -74,7 +81,8 @@
         {
             NodeAddress parent = Address.Parent;
             DetachFromParent();
-            // Take a copy of the children so they disconnect at will
+
+            // Take a copy of the children so they disconnect at will 
             foreach (var child in Children.ToArray())
             {
                 var childNode = Network.FindOrCreate(child);
@@ -93,11 +101,11 @@
 
             var parentNode = Network.FindOrCreate(newParent);
             var actualParentAddress = parentNode.Connect(Address);
-            if (actualParentAddress.Matches( newParent))
+            if (actualParentAddress.Matches(newParent))
             {
                 Address.Parent = newParent;
                 OnIsConnectedChanged();
-            }            
+            }
         }
 
         /// <summary>Disconnect the given child.</summary>
@@ -109,16 +117,18 @@
         }
 
         /// <summary>Sends data across the network.</summary>
-        /// <param name="data">The data.</param>
         /// <param name="type"><see cref="Type"/> to deserialize data back to.</param>
+        /// <param name="data">The data.</param>
+        /// <param name="from">Where the data came from.</param>
         public override void Send(string type, byte[] data, NodeAddress from)
         {
             Network.OnReceived(type, data);
             SendToNetwork(Network, type, data, from);
-        }        
+        }
 
-        public event EventHandler<EventArgs> IsConnectedChanged;
-
+        /// <summary>
+        /// Handler for when the connection status changes.
+        /// </summary>
         protected virtual void OnIsConnectedChanged()
         {
             IsConnectedChanged?.Invoke(this, EventArgs.Empty);

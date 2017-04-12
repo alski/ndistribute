@@ -2,21 +2,20 @@
 {
     using nDistribute;
     using nDistribute.WCF.NetworkServiceClient;
-    using System;
 
     /// <summary>A wrapper to convert between interfaces even though they are the same.</summary>
     internal class WCFClientNode : Node
     {
-        private readonly NodeContractClient _client;
+        private readonly NodeContractClient client;
 
-        /// <summary>Initialises a new instance of the <see cref="WCFClientNode"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="WCFClientNode"/> class.</summary>
         /// <param name="client">The client.</param>
         /// <param name="address">The address.</param>
         /// <param name="network">The network.</param>
         internal WCFClientNode(NodeContractClient client, NodeAddress address, INetwork network)
             : base(address, network)
         {
-            _client = client;
+            this.client = client;
         }
 
         /// <summary>The connect.</summary>
@@ -24,29 +23,30 @@
         /// <returns>The <see cref="NodeAddress"/>.</returns>
         public override NodeAddress Connect(NodeAddress newNode)
         {
-            return _client.Connect(newNode);
+            return client.Connect(newNode);
         }
 
         /// <summary>The advise connect.</summary>
         /// <param name="newParent">The new parent.</param>
         public override void AdviseConnect(NodeAddress newParent)
         {
-            _client.AdviseConnectAsync(newParent);            
+            client.AdviseConnectAsync(newParent);            
         }
 
         /// <summary>The child disconnect.</summary>
         /// <param name="address">The address.</param>        
         public override void ChildDisconnect(NodeAddress address)
         {
-            _client.ChildDisconnectAsync(address);
+            client.ChildDisconnectAsync(address);
         }
 
-        /// <summary>The send.</summary>
-        /// <param name="data">The data.</param>
+        /// <summary>Sends data out across the network.</summary>        
         /// <param name="type"><see cref="Type"/> to deserialize data back to.</param>
+        /// <param name="data">The data.</param>
+        /// <param name="from">Where the data came from.</param>
         public override void Send(string type, byte[] data, NodeAddress from)
         {
-            _client.SendAsync(type, data, from);
+            client.SendAsync(type, data, from);
         }
     }
 }

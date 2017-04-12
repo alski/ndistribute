@@ -1,17 +1,12 @@
 ﻿namespace nDistribute.WCF.Tests.ThatWCFNetwork
 {
     using System.Diagnostics.CodeAnalysis;
-
     using NUnit.Framework;
-
-    using Should;
-    using nDistribute.WCF;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Testing code.")]
     [TestFixture]
     public class SendMethod : CommonSetup
     {
-
         //[Test]
         //public void ShouldSendToParent()
         //{
@@ -56,6 +51,5 @@
         //    this._test2.Send("ShouldSendToParentsChild");
         //    received.ShouldEqual("ShouldSendToParentsChild");
         //}
-
     }
 }

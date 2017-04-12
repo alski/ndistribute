@@ -6,19 +6,22 @@
     /// <summary>A wrapper to convert between interfaces even though they are the same.</summary>
     internal class InProcessProxyNode : Node
     {
-        private readonly InProcessNetwork _network;
-        
-        /// <summary>Initialises a new instance of the <see cref="InProcessProxyNode"/> class.</summary>
+        private readonly InProcessNetwork network;
+
+        /// <summary>Initializes a new instance of the <see cref="InProcessProxyNode"/> class.</summary>
         /// <param name="address">The address.</param>
         /// <param name="network">The network.</param>
         internal InProcessProxyNode(NodeAddress address, InProcessNetwork network)
             : base(address, network)
         {
-            _network = network;
+            this.network = network;
 
             Id = Guid.NewGuid();
         }
 
+        /// <summary>
+        /// Gets a unique Id for this node.
+        /// </summary>
         public Guid Id { get; private set; }
 
         /// <summary>The connect.</summary>
@@ -35,12 +38,6 @@
             return originalNode.Connect(newNode);
         }
 
-        private INode FindOriginalNode()
-        {
-            var network = InProcessNetwork.Networks.Single(n=>n.Local.Address == Address);
-            return network.Local;
-        }
-
         /// <summary>The advise connect.</summary>
         /// <param name="newParent">The new parent.</param>
         public override void AdviseConnect(NodeAddress newParent)
@@ -51,9 +48,10 @@
                 throw new NotImplementedException();
             }
 
-             originalNode.AdviseConnect(newParent);
+            originalNode.AdviseConnect(newParent);
         }
 
+        /// <inheritdoc/>
         public override void ChildDisconnect(NodeAddress address)
         {
             var originalNode = FindOriginalNode();
@@ -65,6 +63,7 @@
             originalNode.ChildDisconnect(address);
         }
 
+        /// <inheritdoc/>
         public override void Send(string type, byte[] data, NodeAddress from)
         {
             var originalNode = FindOriginalNode();
@@ -72,8 +71,14 @@
             {
                 throw new NotImplementedException();
             }
+
             originalNode.Send(type, data, from);
         }
-        
+
+        private INode FindOriginalNode()
+        {
+            var network = InProcessNetwork.Networks.Single(n => n.Local.Address == Address);
+            return network.Local;
+        }
     }
 }

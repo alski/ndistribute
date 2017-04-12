@@ -1,22 +1,42 @@
 ﻿namespace nDistribute.Tests
 {
-    using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-
-    using nDistribute;
-    using System.Runtime.CompilerServices;
     using System.Diagnostics.Contracts;
+    using System.Runtime.CompilerServices;
+    using nDistribute;
 
     /// <summary>An in-process network.</summary>
     internal class InProcessNetwork : NetworkBase
     {
+        private string testMemberName;
+
         static InProcessNetwork()
         {
             SchemaName = "inprocess";
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InProcessNetwork"/> class.
+        /// </summary>
+        private InProcessNetwork()
+        {
+            AddNetwork(this);
+        }
+
+        /// <summary>
+        /// Gets a list of networks we know about just to help with debugging
+        /// </summary>
+        internal static List<InProcessNetwork> Networks { get; } = new List<InProcessNetwork>();
+
+        /// <summary>
+        /// Gets the unique identifier passed to this network on creation
+        /// </summary>
+        internal string NetworkName { get; private set; }
+
+        /// <summary>
+        /// Registers this type with the <see cref="NetworkManager"/>
+        /// </summary>
+        /// <param name="manager">The manager to registre with.</param>
         public static void Register(NetworkManager manager)
         {
             manager.Register(
@@ -27,10 +47,11 @@
                 });
         }
 
-        internal static List<InProcessNetwork> Networks = new List<InProcessNetwork>();
-
-        private string testMemberName;
-
+        /// <summary>
+        /// Factory method to create a new <see cref="InProcessNetwork"/>.
+        /// </summary>
+        /// <param name="testMethod">Name of the method that created this or other uniquely identifier to help with debugging</param>
+        /// <returns>An <see cref="InProcessNetwork"/></returns>
         internal static InProcessNetwork Create([CallerMemberName] string testMethod = "")
         {
             var result = new InProcessNetwork()
@@ -38,21 +59,6 @@
                 testMemberName = testMethod
             };
             return result;
-        }
-
-        /// <summary>Initialises a new instance of the <see cref="InProcessNetwork"/> class.</summary>
-        private InProcessNetwork()
-        {
-            AddNetwork(this);
-        }
-
-        internal string NetworkName { get; private set; }
-
-        private void AddNetwork(InProcessNetwork network)
-        {
-            Contract.Requires(!Networks.Contains(network));
-
-            Networks.Add(this);
         }
 
         /// <summary>Creates the local Node.</summary>
@@ -71,12 +77,21 @@
             {
                 return new InProcessProxyNode(address, this);
             }
+
             return new Node(address, this);
         }
 
+        /// <inheritdoc/>
         protected override NodeAddress GetDefaultNode()
         {
             return new NodeAddress(InProcessNetwork.SchemaName + ":" + testMemberName);
-        }      
+        }
+
+        private void AddNetwork(InProcessNetwork network)
+        {
+            Contract.Requires(!Networks.Contains(network));
+
+            Networks.Add(this);
+        }
     }
 }

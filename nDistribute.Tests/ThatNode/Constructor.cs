@@ -16,6 +16,5 @@
             var network = InProcessNetwork.Create();
             network.Local.HasParent.ShouldBeFalse();
         }
-
     }
 }

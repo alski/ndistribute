@@ -9,17 +9,22 @@
     [DataContract]
     public class NodeAddress : IEquatable<NodeAddress>
     {
-        /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeAddress"/> class.</summary>
         /// <param name="address">The address </param>
         public NodeAddress(string address)
         {
             AsString = address;
         }
 
-        /// <summary>Initialises a new instance of the <see cref="NodeAddress"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="NodeAddress"/> class.</summary>
+        /// <param name="schemaName">Schema that identifies which type of communication we are using to communicate.</param>
+        /// <param name="machineName">Name of the machine.</param>
+        /// <param name="port">Port of the machine.</param>
         public NodeAddress(string schemaName, string machineName, int port)
             : this(schemaName + Uri.SchemeDelimiter + machineName + ":" + port)
-        { }
+        {
+        }
 
         /// <summary>Gets or sets the address.</summary>
         [DataMember]
@@ -28,6 +33,11 @@
         /// <summary>Gets or sets the parent.</summary>
         [DataMember]
         public NodeAddress Parent { get; set; }
+
+        public static implicit operator string(NodeAddress that)
+        {
+            return that.ToString();
+        }
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
@@ -56,11 +66,6 @@
         {
             return other != null
              && AsString == other.AsString;
-        }
-
-        public static implicit operator string(NodeAddress that)
-        {
-            return that.ToString();
         }
     }
 }

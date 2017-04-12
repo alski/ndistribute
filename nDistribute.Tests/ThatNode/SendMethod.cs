@@ -2,11 +2,9 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-
-    using NUnit.Framework;
-
-    using Should;
     using Moq;
+    using NUnit.Framework;
+    using Should;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "TestFixture.")]
     [TestFixture]
@@ -15,7 +13,7 @@
         [Test]
         public void ShouldReceiveOnNetworkWhenSent()
         {
-            var network  = InProcessNetwork.Create();
+            var network = InProcessNetwork.Create();
             var parent = network.Local;
             var channel = network.GetChannel<string>();
             
@@ -83,9 +81,12 @@
 
         [Serializable]
         public class ComplexTypeForTest
-        {
-            public int IntProperty { get; set; }
+        { 
+#pragma warning disable SA1401 // Fields must be private, but here I want to allow the testing of this
             public string StringField;
+#pragma warning restore SA1401 // Fields must be private
+            
+            public int IntProperty { get; set; }
         }
     }
 }

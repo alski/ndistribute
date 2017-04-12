@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
-
-namespace nDistribute.WCF.Tests.ThatNetworkManager
+﻿namespace nDistribute.WCF.Tests.ThatNetworkManager
 {
+    using NUnit.Framework;
+
+    /// <summary>
+    /// Test for connection change events on the network manager
+    /// </summary>
     [TestFixture]
     public class ConnectionChangedEvent
     {
+        /// <summary>
+        /// Tests that <see cref="NetworkBase.IsConnectedChanged"/> event
+        /// </summary>
         [Test]
         public void ShouldNotifyWhenNewConnectionAdded()
         {
+            //Add a test here
         }
     }
 }

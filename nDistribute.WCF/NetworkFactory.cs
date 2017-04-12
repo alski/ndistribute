@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace nDistribute.WCF
+﻿namespace nDistribute.WCF
 {
+    using System.Net;
+    using System.Net.Sockets;
+
+    /// <summary>
+    /// A set of helper methods for networks
+    /// </summary>
     public static class NetworkFactory
     {
+        /// <summary>
+        /// Finds a free tcp port.
+        /// </summary>
+        /// <returns>The id of the free port.</returns>
         public static int FreeTcpPort()
         {
             var l = new TcpListener(IPAddress.Loopback, 0);

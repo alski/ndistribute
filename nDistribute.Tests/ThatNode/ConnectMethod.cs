@@ -63,7 +63,8 @@
 
             grandParent.HasChild(parent).ShouldBeTrue();
             parentNetwork.Local.HasChild(child).ShouldBeTrue();
-            //but local representation doesn't know about grandparent relationship
+            
+            // but local representation doesn't know about grandparent relationship
             parentNode.HasChild(child).ShouldBeFalse();
         }
 
@@ -144,7 +145,5 @@
             childNode.IsConnected.ShouldBeTrue();            
             ((NodeWithoutContract)childNode).Children.Count.ShouldEqual(0);
         }
-     
-
     }
 }

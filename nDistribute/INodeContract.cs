@@ -1,6 +1,5 @@
 namespace nDistribute
 {
-    using System;
     using System.ServiceModel;
 
     /// <summary>The Node remote contract. This should be implemented to facilitate communication between nodes.</summary>
@@ -12,7 +11,8 @@ namespace nDistribute
         /// This could mean that this node actually becomes the child of a completely different node, for example when the 
         /// node we asked is already full and delegates us to its child. Alternatively it could decide that we shouldn't be anyone's child,
         /// so it will attempt to connect to us by calling our <see cref="Connect"/> instead.</remarks>
-        /// <param name="newNode">The new node.</param>        
+        /// <param name="newNode">The new node.</param>
+        /// <returns>The <see cref="NodeAddress"/> of the node we should connect to.</returns>        
         [OperationContract]
         NodeAddress Connect(NodeAddress newNode);
 
@@ -33,7 +33,6 @@ namespace nDistribute
 
         /// <summary>Advises a child node to disconnect from its parent.</summary>
         /// <param name="address">The address.</param>
-        /// <returns>The <see cref="bool"/>.</returns>
         [OperationContract(IsOneWay=true)]
         void ChildDisconnect(NodeAddress address);
 

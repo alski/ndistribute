@@ -3,18 +3,27 @@
     using NUnit.Framework;
     using Should;
 
+    /// <summary>
+    /// Tests for inprocess communication 
+    /// </summary>
     [TestFixture]
     public class InProcessTests
     {
+        /// <summary>
+        /// Shoudl create a local node
+        /// </summary>
         [Test]
         public void ShouldCreateLocalNode()
         {
             var network1 = InProcessNetwork.Create();
             var node1 = network1.Local;
             node1.ShouldNotBeNull();
-            node1.Address.AsString.ShouldEqual(InProcessNetwork.SchemaName+ ":ShouldCreateLocalNode");
+            node1.Address.AsString.ShouldEqual(InProcessNetwork.SchemaName + ":ShouldCreateLocalNode");
         }
 
+        /// <summary>
+        /// The inprocess network should not share nodes
+        /// </summary>
         [Test]
         public void ShouldNotShareNodes()
         {
@@ -45,7 +54,6 @@
 
             var network2Node1 = network2.FindOrDefault(node1.Address);
             network2Node1.ShouldNotBeNull();
-
         }
     }
 }

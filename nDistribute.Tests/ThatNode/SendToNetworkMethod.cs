@@ -1,12 +1,9 @@
 ﻿namespace nDistribute.Tests.ThatNode
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
-
-    using NUnit.Framework;
-
-    using Should;
     using Moq;
+    using NUnit.Framework;
+    using Should;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "TestFixture.")]
     [TestFixture]
@@ -28,7 +25,7 @@
 
             var local = new Node(localAddress, network.Object);
             local.Connect(childAddress);
-            local.SendToNetwork(network.Object, typeof(string).ToString(),NetworkChannel<string>.Serialize(data), null);
+            local.SendToNetwork(network.Object, typeof(string).ToString(), NetworkChannel<string>.Serialize(data), null);
 
             child.Verify(x => x.Send(typeof(string).ToString(), It.IsAny<byte[]>(), It.IsAny<NodeAddress>()));
         }
@@ -93,7 +90,6 @@
 
             parent.Verify(x => x.Send(typeof(string).ToString(), It.IsAny<byte[]>(), It.IsAny<NodeAddress>()), Times.Never());
         }
-
 
         [Test]
         public void ShouldNotReceiveOnNetworkWhenSentIfISentIt()

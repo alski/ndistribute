@@ -1,16 +1,17 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Should;
-
-namespace nDistribute.WCF.Tests.ThatNetworkManager
+﻿namespace nDistribute.WCF.Tests.ThatNetworkManager
 {
+    using NUnit.Framework;
+    using Should;
+
+    /// <summary>
+    /// Tests for the <see cref="NetworkManager.ConnectTo(NodeAddress)"/> method
+    /// </summary>
     [TestFixture]
     public class ConnectToMethod
     {
+        /// <summary>
+        /// Tests that <see cref="NetworkManager.ConnectTo(NodeAddress)"/>  should connect
+        /// </summary>
         [Test]
         public void ShouldConnect()
         {
@@ -27,7 +28,9 @@ namespace nDistribute.WCF.Tests.ThatNetworkManager
             connection.ShouldNotBeNull();
         }
 
-
+        /// <summary>
+        /// Tests that <see cref="NetworkManager.ConnectTo(NodeAddress)"/> should not connect if the network type is unregistered.
+        /// </summary>
         [Test]
         public void ShouldNotConnectIfUnregistered()
         {
@@ -35,8 +38,5 @@ namespace nDistribute.WCF.Tests.ThatNetworkManager
             var connection = manager.ConnectTo(new NodeAddress(WCFNetwork.SchemaName + ":xxxx"));
             connection.ShouldBeNull();
         }
-
     }
 }
-
-
