@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncInProcessNetwork.cs" />
+    <Compile Include="AsyncInProcessProxyNode.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="InProcessTests.cs" />
     <Compile Include="ThatNetworkManager\ConnectionsProperty.cs" />

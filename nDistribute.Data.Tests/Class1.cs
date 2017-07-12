@@ -18,12 +18,11 @@ namespace nDistribute.Data.Tests
         public void ShouldBuildCollectionFromStreamOfEvents()
         {
             var result = new List<int>();
-
             
-            var receiverNetwork = InProcessNetwork.Create();
+            var receiverNetwork = AsyncInProcessNetwork.Create();
             var receiverChannel = receiverNetwork.GetChannel<int>();
 
-            var senderNetwork = InProcessNetwork.Create("receiver");
+            var senderNetwork = AsyncInProcessNetwork.Create("receiver");
             var senderChannel = senderNetwork.GetChannel<int>();
             senderNetwork.Connect(receiverNetwork.Local.Address);
             
@@ -32,6 +31,8 @@ namespace nDistribute.Data.Tests
             senderChannel.Send(1);
             senderChannel.Send(2);
             senderChannel.Send(3);
+
+            senderNetwork.WaitForTasks();
 
             result.First().ShouldEqual(1);
             result.Skip(1).First().ShouldEqual(2);
