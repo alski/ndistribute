@@ -6,7 +6,7 @@
     using nDistribute;
 
     /// <summary>An in-process network.</summary>
-    internal class InProcessNetwork : NetworkBase
+    public class InProcessNetwork : NetworkBase
     {
         private string testMemberName;
 
@@ -52,7 +52,7 @@
         /// </summary>
         /// <param name="testMethod">Name of the method that created this or other uniquely identifier to help with debugging</param>
         /// <returns>An <see cref="InProcessNetwork"/></returns>
-        internal static InProcessNetwork Create([CallerMemberName] string testMethod = "")
+        public static InProcessNetwork Create([CallerMemberName] string testMethod = "")
         {
             var result = new InProcessNetwork()
             {
