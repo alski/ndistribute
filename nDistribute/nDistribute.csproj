@@ -43,22 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectedEventArgs.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IChannel.cs" />
-    <Compile Include="INetwork.cs" />
-    <Compile Include="NetworkBase.cs" />
-    <Compile Include="INodeContract.cs" />
-    <Compile Include="FirstComeFirstElectedStrategy.cs" />
-    <Compile Include="NetworkChannel.cs" />
-    <Compile Include="NetworkManager.cs" />
-    <Compile Include="NetworkRegistration.cs" />
-    <Compile Include="NewcomerElectedStrategy.cs" />
-    <Compile Include="IElectionStrategy.cs" />
-    <Compile Include="INode.cs" />
-    <Compile Include="Node.cs" />
-    <Compile Include="NodeAddress.cs" />
-    <Compile Include="NodeWithoutContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
