@@ -1,8 +1,7 @@
-﻿namespace nDistribute.UWP.Tests.ThatWebSocket
+﻿namespace nDistribute
 {
     using System;
     using System.Threading.Tasks;
-
 
     public class Local
     {
@@ -19,7 +18,6 @@
         }
 
         public EventHandler<string> MessageReceived { get; set; }
-
 
         public IAsyncTransportServer Transport { get; }
 

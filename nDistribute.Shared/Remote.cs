@@ -1,10 +1,7 @@
-﻿namespace nDistribute.UWP.Tests.ThatWebSocket
+﻿namespace nDistribute
 {
     using System;
-    using System.IO;
     using System.Threading.Tasks;
-    using Windows.Networking;
-    using Windows.Networking.Sockets;
 
     public class Remote
     {

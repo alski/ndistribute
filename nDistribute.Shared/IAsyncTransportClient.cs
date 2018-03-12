@@ -1,4 +1,4 @@
-﻿namespace nDistribute.UWP.Tests.ThatWebSocket
+﻿namespace nDistribute
 {
     using System.Threading.Tasks;
 
