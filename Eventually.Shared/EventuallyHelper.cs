@@ -23,6 +23,20 @@ namespace Eventually
                 TimeOut = TimeSpan.FromSeconds(timeoutSeconds),
                 Interval = TimeSpan.FromSeconds(intervalSeconds)
             };
-        }        
+        }
+
+        public static CheckUntil<object> Eventually(
+         Action should,
+         int timeoutSeconds = CheckUntil.DefaultTimeout,
+         int intervalSeconds = CheckUntil.DefaultInterval)
+        {
+            return new CheckUntil<object>
+            {
+                SourceObject = null,
+                ShouldOrThrow = x=> should(),
+                TimeOut = TimeSpan.FromSeconds(timeoutSeconds),
+                Interval = TimeSpan.FromSeconds(intervalSeconds)
+            };
+        }
     }
 }
