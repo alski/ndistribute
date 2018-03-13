@@ -17,28 +17,14 @@
 
             public Server()
             {
-                var connection = NetworkInformation.GetInternetConnectionProfile();
-
-                if (connection?.NetworkAdapter != null)
-                {
-                    RemoteName = NetworkInformation.GetHostNames()
-                    .FirstOrDefault(hostname =>
-                        hostname.Type == HostNameType.Ipv4
-                        && hostname.IPInformation?.NetworkAdapter?.NetworkAdapterId == connection.NetworkAdapter.NetworkAdapterId);
-                }
-                else
-                {
-                    RemoteName = new HostName("localHost");
-                }
             }
 
             public string Port => server.Information.LocalPort;
 
-            public HostName RemoteName { get; }
-
             public async Task StartLocalAsync()
             {
                 //Server
+                await server.BindServiceNameAsync("53700");
                 server.ConnectionReceived += async (sender, args) =>
                 {
                     using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
