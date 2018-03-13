@@ -12,10 +12,11 @@
     using Windows.Web.Http;
     using System.Net;
     using Windows.Networking;
+    using Windows.Networking.Connectivity;
 
     public class Locator
     {
-        public static async Task<HostName> GetCurrentIPAddress()
+        public static async Task<HostName> GetRemoteHostName()
         {
             using (var client = new HttpClient())
             {
@@ -23,6 +24,20 @@
                 var address = await response.Content.ReadAsStringAsync();
                 return new HostName(address);
             }
+        }
+
+        public static HostName GetNetworkHostName()
+        {
+            var connection = NetworkInformation.GetInternetConnectionProfile();
+
+            if (connection?.NetworkAdapter != null)
+            {
+                return  NetworkInformation.GetHostNames()
+                .FirstOrDefault(hostname =>
+                    hostname.Type == HostNameType.Ipv4
+                    && hostname.IPInformation?.NetworkAdapter?.NetworkAdapterId == connection.NetworkAdapter.NetworkAdapterId);
+            }
+            return null;
         }
     }
 
@@ -33,7 +48,7 @@
         [TestMethod]
         public async Task ShouldFindIPAddress()
         {
-            var ipAddress = await Locator.GetCurrentIPAddress();
+            var ipAddress = await Locator.GetRemoteHostName();
             ipAddress.ShouldNotBeNull();
             var ip = ipAddress.IPInformation.ToString();
             //Not loopback
@@ -58,7 +73,10 @@
             local.MessageReceived += (s, e) => messageReceived = e;
             await local.StartAsync();
 
-            var remote = new Remote(new StreamSocketTransport.Client(server.RemoteName, server.Port));
+
+
+
+            var remote = new Remote(new StreamSocketTransport.Client(Locator.GetNetworkHostName(), server.Port));
             await remote.SendAsync();
 
             EventuallyHelper.Eventually(() => messageReceived.ShouldNotBeNullOrEmpty());
