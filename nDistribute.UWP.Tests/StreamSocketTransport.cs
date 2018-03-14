@@ -24,7 +24,6 @@
             public async Task StartLocalAsync()
             {
                 //Server
-                await server.BindServiceNameAsync("53700");
                 server.ConnectionReceived += async (sender, args) =>
                 {
                     using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
@@ -38,7 +37,75 @@
                 };
 
                 //string.Empty is find me a port :-)
-                await server.BindServiceNameAsync(string.Empty);
+                await server.BindServiceNameAsync("53700");
+                // await server.BindServiceNameAsync(string.Empty);                 
+                
+            }
+
+            public EventHandler<string> MessageReceived { get; set; }
+        }
+
+        public class Client : IAsyncTransportClient
+        {
+            public Client(HostName hostName, string port)
+            {
+                HostName = hostName;
+                Port = port;
+            }
+            public HostName HostName { get; }
+            public string Port { get; }
+
+            public async Task SendAsync(string request)
+            {
+                using (var client = new StreamSocket())
+                {
+                    await client.ConnectAsync(HostName, Port);
+
+                    // Send a request to the echo server.
+                    using (Stream outputStream = client.OutputStream.AsStreamForWrite())
+                    {
+                        using (var streamWriter = new StreamWriter(outputStream))
+                        {
+                            await streamWriter.WriteLineAsync(request);
+                            await streamWriter.FlushAsync();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static class DatagramSocketTransport
+    {
+        public class Server : IAsyncTransportServer
+        {
+            private DatagramSocket server = new DatagramSocket();
+
+            public Server()
+            {
+            }
+
+            public string Port => server.Information.LocalPort;
+
+            public async Task StartLocalAsync()
+            {
+                //Server
+                server.MessageReceived += (sender, args) =>
+                {
+                    using (var streamReader = args.GetDataReader())
+                        //.Socket.InputStream.AsStreamForRead()))
+                    {
+                        MessageReceived.Invoke(this, streamReader.ReadString(streamReader.UnconsumedBufferLength));
+                    }
+                    Debug.WriteLine("Message received: " + MessageReceived);
+
+                    //sender should be disposed....
+                    sender.Dispose();
+                };
+
+                //string.Empty is find me a port :-)
+                await server.BindServiceNameAsync("53700");
+                // await server.BindServiceNameAsync(string.Empty);                
             }
 
             public EventHandler<string> MessageReceived { get; set; }
