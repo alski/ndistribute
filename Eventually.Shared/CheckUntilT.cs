@@ -11,7 +11,7 @@ namespace Eventually
         public TObject SourceObject { get; set; }
         public Action<TObject> ShouldOrThrow { get; set; }
 
-        protected void Check()
+        internal void Check()
         {
             var then = DateTime.Now.Add(TimeOut);
             while (DateTime.Now < then)

@@ -92,7 +92,7 @@
                 //listener.
                 string result = string.Empty;
 
-                var host = new HostName("localhost");
+                var host = new HostName("192.168.0.31");
                 var comms = new DatagramSocket();
                 comms.MessageReceived += async (s, args) =>
                 {
@@ -103,7 +103,7 @@
                     }
                 };
 
-                using (Stream outputStream = (await comms.GetOutputStreamAsync(host, "53722")).AsStreamForWrite())
+                using (Stream outputStream = (await comms.GetOutputStreamAsync(host, "20000")).AsStreamForWrite())
                 {
                     using (var streamWriter = new StreamWriter(outputStream))
                     {
@@ -112,7 +112,9 @@
                     }
                 }
 
-                EventuallyHelper.Eventually(() => result.ShouldNotBeEmpty());
+                EventuallyHelper.Eventually(() => result.ShouldNotBeNullOrEmpty());
+
+                result.ShouldNotBeNullOrEmpty();
             }
 
         }

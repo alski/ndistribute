@@ -10,33 +10,33 @@ namespace Eventually
 
     public static class EventuallyHelper
     {
-        public static CheckUntil<TObject> Eventually<TObject>(
+        public static void Eventually<TObject>(
             this TObject sourceObject, 
             Action<TObject> should, 
             int timeoutSeconds = CheckUntil.DefaultTimeout, 
             int intervalSeconds = CheckUntil.DefaultInterval)
         {
-            return new CheckUntil<TObject>
+            new CheckUntil<TObject>
             {
                 SourceObject = sourceObject,
                 ShouldOrThrow = should,
                 TimeOut = TimeSpan.FromSeconds(timeoutSeconds),
                 Interval = TimeSpan.FromSeconds(intervalSeconds)
-            };
+            }.Check();
         }
 
-        public static CheckUntil<object> Eventually(
+        public static void Eventually(
          Action should,
          int timeoutSeconds = CheckUntil.DefaultTimeout,
          int intervalSeconds = CheckUntil.DefaultInterval)
         {
-            return new CheckUntil<object>
+            new CheckUntil<object>
             {
                 SourceObject = null,
-                ShouldOrThrow = x=> should(),
+                ShouldOrThrow = x => should(),
                 TimeOut = TimeSpan.FromSeconds(timeoutSeconds),
                 Interval = TimeSpan.FromSeconds(intervalSeconds)
-            };
+            }.Check();
         }
     }
 }
